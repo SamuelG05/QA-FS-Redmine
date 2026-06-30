@@ -219,6 +219,81 @@ Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $h
 
 ---
 
+### /finalizar-caso
+Consolida o encerramento de uma issue: verifica se o plano de teste existe, consulta o status e o tamanho SP, e finaliza o caso como Resolvido.
+
+**Fluxo:**
+
+1. Se o número da issue não foi informado, peça: *"Qual o número da issue? (#)"*
+
+2. Busque os dados completos da issue incluindo journals e campos customizados:
+```powershell
+$headers = @{ "X-Redmine-API-Key" = $config.api_key }
+$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journals,custom_fields" -Headers $headers
+```
+
+3. Exiba um resumo do estado atual:
+   - **Título** da issue
+   - **Status** atual
+   - **Tamanho SP** (campo customizado — procure em `custom_fields` pelo name `"Tamanho SP"` ou similar)
+
+4. **Verifique se existe um Plano de Teste** — procure nos journals por uma nota que contenha o texto `"PLANO DE TESTE"`:
+```powershell
+$temPlano = $issue.issue.journals | Where-Object { $_.notes -match "PLANO DE TESTE" }
+```
+
+   - **Se NÃO existir plano:**
+     > "Não encontrei nenhum Plano de Teste registrado nessa issue. Deseja gerar o plano de teste antes de finalizar? (/plano-teste)"
+     - Se **sim**: execute o fluxo completo do `/plano-teste` e depois retome o `/finalizar-caso`
+     - Se **não**: prossiga sem o plano
+
+   - **Se existir plano:** continue normalmente
+
+5. **Tamanho SP:**
+   - Se o campo estiver **vazio ou nulo**:
+     > "O campo Tamanho SP está em branco. Qual o tamanho SP?"
+   - Se já estiver **preenchido**:
+     > "O Tamanho SP está como `<valor atual>`. Deseja ajustar?"
+     - Se sim: peça o novo valor
+     - Se não: mantenha o valor atual
+
+6. **Finalizar como Resolvido:**
+   > "Posso marcar a issue como Resolvido?"
+   - Se **não**: encerre sem alterar o status
+   - Se **sim**: busque o ID do status "Resolvido":
+```powershell
+$statuses = Invoke-RestMethod -Uri "$($config.url)/issue_statuses.json" -Headers $headers
+$statusId = ($statuses.issue_statuses | Where-Object { $_.name -eq "Resolvido" }).id
+```
+
+7. Mostre o resumo completo do que será alterado e peça confirmação final antes de aplicar:
+```
+Issue #<id>: <título>
+- Status: <atual> → Resolvido
+- Tamanho SP: <atual> → <novo valor>
+```
+
+8. Aplique tudo em uma única chamada:
+```powershell
+$headers["Content-Type"] = "application/json"
+
+# Monte o body com status e campo SP
+$customFields = @(@{ id = <id_campo_sp>; value = "<tamanho_sp>" })
+$body = @{ issue = @{ status_id = $statusId; custom_fields = $customFields } } | ConvertTo-Json -Depth 5
+Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
+```
+
+   Para descobrir o `id` do campo SP, busque antes:
+```powershell
+$issue.issue.custom_fields | Where-Object { $_.name -match "SP" }
+```
+
+9. Confirme o sucesso ao usuário com o título da issue e as alterações aplicadas.
+
+**Regra absoluta: nunca alterar nada sem aprovação explícita do usuário a cada etapa.**
+
+---
+
 ## Observações gerais
 
 - Sempre exibir o **título** da issue nas respostas
