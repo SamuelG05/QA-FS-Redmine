@@ -1,6 +1,6 @@
 # 🧪 QA-FS-Redmine
 
-> Skill do Claude para automação de processos de Q.A no Redmine da Fácil Sistemas.
+> Skill do Claude para automação de processos de Q.A no Redmine.
 
 Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar issues, iniciar testes e gerar planos de teste documentados — tudo sem sair da conversa.
 
@@ -36,9 +36,9 @@ C:\Users\<usuario>\Documents\QA-FS-Redmine\config.json
 Usuário: /inicia-teste #18072
 
 Claude:
-  Issue #18072: Retaguarda - Cadastro de NCM...
+  Issue #18072: Título da issue...
   Status atual: Liber. Testes → Em Testes
-  Atribuído a: (ninguém) → Samuel Gonçalves
+  Atribuído a: (ninguém) → Seu Nome
   Confirma as alterações?
 
 Usuário: Sim
@@ -115,5 +115,5 @@ QA-FS-Redmine/
 ---
 
 <div align="center">
-  <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a> · Fácil Sistemas</sub>
+  <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub>
 </div>
