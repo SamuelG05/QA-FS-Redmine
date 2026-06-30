@@ -249,7 +249,38 @@ $temPlano = $issue.issue.journals | Where-Object { $_.notes -match "PLANO DE TES
 
    - **Se existir plano:** continue normalmente
 
-5. **Tamanho SP:**
+5. **CheckList Resolvido** (campo ID 126):
+
+   Exiba as opções disponíveis e os itens já marcados (se houver):
+   ```
+   CheckList Resolvido — marque os itens aplicáveis:
+   1. Análise de Risco
+   2. Teste exploratório
+   3. Criação dos cenários
+   4. Automação dos testes
+   5. Execução da Automação
+   ```
+
+   Pergunte ao usuário quais deseja marcar. Aceite respostas flexíveis:
+   - `"todos"` → marca os 5 itens
+   - `"1, 2, 3"` ou `"1 2 3"` → marca os itens indicados
+   - `"somente 2"` → marca apenas o item 2
+   - `"1, 3, 5"` → marca os itens 1, 3 e 5
+
+   Monte o array com os nomes exatos dos itens selecionados:
+   ```powershell
+   # Exemplo: usuário escolheu 1, 2, 4, 5
+   $checklist = @("Análise de risco", "Teste exploratório", "Automação dos testes", "Execução da Automação")
+   ```
+
+   Os nomes exatos aceitos pela API são:
+   - `"Análise de risco"`
+   - `"Teste exploratório"`
+   - `"Criação dos cenários"`
+   - `"Automação dos testes"`
+   - `"Execução da Automação"`
+
+6. **Tamanho SP:**
    - Se o campo estiver **vazio ou nulo**:
      > "O campo Tamanho SP está em branco. Qual o tamanho SP?"
    - Se já estiver **preenchido**:
@@ -266,26 +297,24 @@ $statuses = Invoke-RestMethod -Uri "$($config.url)/issue_statuses.json" -Headers
 $statusId = ($statuses.issue_statuses | Where-Object { $_.name -eq "Resolvido" }).id
 ```
 
-7. Mostre o resumo completo do que será alterado e peça confirmação final antes de aplicar:
+8. Mostre o resumo completo do que será alterado e peça confirmação final antes de aplicar:
 ```
 Issue #<id>: <título>
 - Status: <atual> → Resolvido
+- CheckList Resolvido: <itens selecionados>
 - Tamanho SP: <atual> → <novo valor>
 ```
 
-8. Aplique tudo em uma única chamada:
+9. Aplique tudo em uma única chamada incluindo status, checklist e tamanho SP:
 ```powershell
 $headers["Content-Type"] = "application/json"
 
-# Monte o body com status e campo SP
-$customFields = @(@{ id = <id_campo_sp>; value = "<tamanho_sp>" })
+$customFields = @(
+    @{ id = 126; value = $checklist },         # CheckList Resolvido (array de strings)
+    @{ id = 10;  value = "<tamanho_sp>" }      # Tamanho SP
+)
 $body = @{ issue = @{ status_id = $statusId; custom_fields = $customFields } } | ConvertTo-Json -Depth 5
 Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
-```
-
-   Para descobrir o `id` do campo SP, busque antes:
-```powershell
-$issue.issue.custom_fields | Where-Object { $_.name -match "SP" }
 ```
 
 9. Confirme o sucesso ao usuário com o título da issue e as alterações aplicadas.
