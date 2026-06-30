@@ -84,7 +84,12 @@ $issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journal
    - `description` → documentação do dev: o que foi implementado, escopo, premissas técnicas, dados de teste
    - `journals` → notas do QA: situações encontradas, critérios validados, observações, telas testadas
 
-4. **Gere o Plano de Teste** seguindo rigorosamente o padrão abaixo em Textile:
+4. Após ler o caso, pergunte ao usuário:
+   > "Quais testes foram feitos? Descreva as telas testadas, situações encontradas e o resultado geral."
+
+   Use a resposta do usuário para enriquecer as seções **6. Casos de Teste**, **7. Situações Encontradas**, **8. Testes Realizados** e **9. Considerações Finais** do plano. Combine o que está documentado no Redmine com o que o usuário relatar — o relato do usuário tem prioridade para refletir o que foi testado de fato.
+
+5. **Gere o Plano de Teste** seguindo rigorosamente o padrão abaixo em Textile:
 
 ```
 h1. PLANO DE TESTE – Funcionalidade #<id>
