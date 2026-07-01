@@ -153,7 +153,7 @@ Claude:
 Usuário: Não
 
 Claude:
-  O desenvolvedor identificado foi Cledson Assunção.
+  O desenvolvedor identificado foi [Nome do Dev].
   Deseja atribuir o caso a ele ao resolver?
 
 Usuário: Sim
@@ -166,7 +166,7 @@ Usuário: Sim
 Claude:
   Resumo das alterações:
   - Status: Em Testes → Resolvido
-  - Atribuído a: Samuel Gonçalves → Cledson Assunção
+  - Atribuído a: [QA] → [Nome do Dev]
   - CheckList: todos os 5 itens marcados
   - Tamanho SP: 7 (mantido)
   Confirma?
