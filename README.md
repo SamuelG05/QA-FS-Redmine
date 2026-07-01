@@ -2,7 +2,7 @@
 
 > Skill do Claude para automação de processos de Q.A no Redmine.
 
-Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar issues, iniciar testes, gerar planos de teste e finalizar casos — tudo sem sair da conversa.
+Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, iniciar testes, gerar planos de teste, registrar situações e finalizar casos — tudo sem sair da conversa.
 
 ---
 
@@ -10,11 +10,11 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar issues,
 
 | Comando | Descrição |
 |---|---|
-| `/inicia-teste` | Atribui a issue ao usuário logado e muda o status para **Em Testes** |
-| `/plano-teste` | Lê toda a documentação da issue e gera um **Plano de Teste** completo no padrão da equipe |
-| `/finalizar-caso` | Verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
+| `/inicia-teste` | Atribui o caso ao usuário logado e muda o status para **Em Testes** |
+| `/plano-teste` | Lê toda a documentação do caso e gera um **Plano de Teste** completo no padrão da equipe |
 | `/registrar-situacao` | Formata e registra uma situação encontrada durante os testes, com suporte a anexo de imagem |
-| `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela na issue |
+| `/finalizar-caso` | Identifica o dev, verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
+| `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela no caso |
 
 ---
 
@@ -39,7 +39,7 @@ C:\Users\<usuario>\Documents\QA-FS-Redmine\config.json
 Usuário: /inicia-teste #18072
 
 Claude:
-  Issue #18072: Título da issue...
+  Caso #18072: Título do caso...
   Status atual: Liber. Testes → Em Testes
   Atribuído a: (ninguém) → Seu Nome
   Confirma as alterações?
@@ -62,7 +62,7 @@ Claude: [lê descrição do dev + notas do QA no Redmine]
 Usuário: [descreve telas testadas, situações encontradas e resultado]
 
 Claude: [gera plano completo em formato Textile]
-        O plano está aprovado? Deseja documentar na issue?
+        O plano está aprovado? Deseja documentar no caso?
 
 Usuário: Sim
 
@@ -71,7 +71,7 @@ Claude: Deseja ajustar algo antes de postar?
 
 Usuário: Não, pode postar
 
-Claude: ✅ Plano de teste postado na issue #18001!
+Claude: ✅ Plano de teste postado no caso #18001!
 ```
 
 ---
@@ -89,56 +89,6 @@ O plano gerado segue o formato **Textile** nativo do Redmine com as seções:
 7. Situações Encontradas Durante os Testes
 8. Testes Realizados
 9. Considerações Finais
-
----
-
-## 📋 Fluxo — `/finalizar-caso`
-
-```
-Usuário: /finalizar-caso #18044
-
-Claude:
-  Issue #18044: Título da issue...
-  Status atual: Em Testes
-  Tamanho SP: 7
-
-  ⚠️ Nenhum Plano de Teste encontrado. Deseja gerar antes de finalizar?
-
-Usuário: Não
-
-Claude:
-  CheckList Resolvido — marque os itens aplicáveis:
-  1. Análise de Risco
-  2. Teste exploratório
-  3. Criação dos cenários
-  4. Automação dos testes
-  5. Execução da Automação
-
-  Quais deseja marcar?
-
-Usuário: todos
-
-Claude:
-  O Tamanho SP está como 7. Deseja ajustar?
-
-Usuário: Não
-
-Claude:
-  Posso marcar a issue como Resolvido?
-
-Usuário: Sim
-
-Claude:
-  Resumo das alterações:
-  - Status: Em Testes → Resolvido
-  - CheckList: todos os 5 itens marcados
-  - Tamanho SP: 7 (mantido)
-  Confirma?
-
-Usuário: Sim
-
-Claude: ✅ Caso #18044 finalizado com sucesso!
-```
 
 ---
 
@@ -171,13 +121,70 @@ Claude: ✅ Situação registrada com imagem no caso #18044!
 
 ---
 
+## 📋 Fluxo — `/finalizar-caso`
+
+```
+Usuário: /finalizar-caso #18044
+
+Claude:
+  Caso #18044: Título do caso...
+  Status atual: Em Testes
+  Tamanho SP: 7
+
+  ⚠️ Nenhum Plano de Teste encontrado. Deseja gerar antes de finalizar?
+
+Usuário: Não
+
+Claude:
+  CheckList Resolvido — marque os itens aplicáveis:
+  1. Análise de Risco
+  2. Teste exploratório
+  3. Criação dos cenários
+  4. Automação dos testes
+  5. Execução da Automação
+
+  Quais deseja marcar?
+
+Usuário: Todos
+
+Claude:
+  O Tamanho SP está como 7. Deseja ajustar?
+
+Usuário: Não
+
+Claude:
+  O desenvolvedor identificado foi Cledson Assunção.
+  Deseja atribuir o caso a ele ao resolver?
+
+Usuário: Sim
+
+Claude:
+  Posso marcar o caso como Resolvido?
+
+Usuário: Sim
+
+Claude:
+  Resumo das alterações:
+  - Status: Em Testes → Resolvido
+  - Atribuído a: Samuel Gonçalves → Cledson Assunção
+  - CheckList: todos os 5 itens marcados
+  - Tamanho SP: 7 (mantido)
+  Confirma?
+
+Usuário: Sim
+
+Claude: ✅ Caso #18044 finalizado com sucesso!
+```
+
+---
+
 ## 📋 Fluxo — `/refinar-caso`
 
 ```
 Usuário: /refinar-caso #18044
 
 Claude:
-  Issue #18044: Título da issue...
+  Caso #18044: Título do caso...
   Qual a pontuação do refinamento? (Dev, Teste, Cenário)
 
 Usuário: 1, 6, sim
@@ -188,11 +195,11 @@ Claude:
   | Teste | 6 |
   | Cenário | Sim |
 
-  Está correto? Posso registrar na issue?
+  Está correto? Posso registrar no caso?
 
 Usuário: Sim
 
-Claude: ✅ Refinamento registrado na issue #18044!
+Claude: ✅ Refinamento registrado no caso #18044!
 ```
 
 ---
