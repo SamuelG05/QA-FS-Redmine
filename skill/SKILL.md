@@ -329,6 +329,68 @@ Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $h
 
 ---
 
+### /registrar-situacao
+Registra uma situação encontrada durante os testes no caso, com descrição formatada e suporte a anexo de imagem.
+
+**Fluxo:**
+
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
+
+2. Busque o título do caso para confirmar:
+```powershell
+$headers = @{ "X-Redmine-API-Key" = $config.api_key }
+$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journals" -Headers $headers
+```
+Exiba: **#id — Título do caso**
+
+3. Verifique quantas situações já existem nos journals (procure por notas que contenham "Situação") para numerar a próxima corretamente.
+
+4. Pergunte a situação:
+   > "Qual a situação encontrada?"
+
+5. Formate e melhore a descrição mantendo o conteúdo original, corrigindo gramática e deixando clara e objetiva. Monte no padrão:
+
+```
+*Situação <N>:*
+<descrição formatada e melhorada>
+```
+
+6. Exiba a situação formatada ao usuário e pergunte:
+   > "A descrição está correta? Posso registrar no caso?"
+   
+   Se não: peça ajustes e reformate.
+
+7. **Lembrete de imagem — exiba sempre, em toda resposta deste comando:**
+   > "📎 Lembre-se: se houver imagem, ela deve ser anexada como **arquivo** (arraste o arquivo até a conversa). Prints com Ctrl+V não funcionam como anexo no Redmine."
+
+8. Pergunte se há imagem a anexar:
+   > "Vai anexar alguma imagem? Se sim, arraste o arquivo aqui antes de confirmar."
+
+   - **Se sim e o arquivo foi arrastado:** salve-o temporariamente e faça o upload antes de postar:
+```powershell
+$bytes = [System.IO.File]::ReadAllBytes("<caminho_temp>\imagem.png")
+$uploadHeaders = @{ "X-Redmine-API-Key" = $config.api_key; "Content-Type" = "application/octet-stream" }
+$upload = Invoke-RestMethod -Uri "$($config.url)/uploads.json" -Method Post -Headers $uploadHeaders -Body $bytes
+
+$body = @{
+    issue = @{
+        notes = "<situacao formatada>"
+        uploads = @(@{ token = $upload.upload.token; filename = "imagem.png"; content_type = "image/png" })
+    }
+} | ConvertTo-Json -Depth 5
+```
+
+   - **Se não:** poste apenas a nota:
+```powershell
+$headers["Content-Type"] = "application/json"
+$body = @{ issue = @{ notes = "<situacao formatada>" } } | ConvertTo-Json -Depth 5
+Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
+```
+
+9. Confirme o sucesso ao usuário com o número e título do caso.
+
+---
+
 ### /refinar-caso
 Registra a pontuação de refinamento de uma issue (Dev, Teste e Cenário) como nota no Redmine.
 

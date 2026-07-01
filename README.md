@@ -13,6 +13,7 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar issues,
 | `/inicia-teste` | Atribui a issue ao usuário logado e muda o status para **Em Testes** |
 | `/plano-teste` | Lê toda a documentação da issue e gera um **Plano de Teste** completo no padrão da equipe |
 | `/finalizar-caso` | Verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
+| `/registrar-situacao` | Formata e registra uma situação encontrada durante os testes, com suporte a anexo de imagem |
 | `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela na issue |
 
 ---
@@ -137,6 +138,35 @@ Claude:
 Usuário: Sim
 
 Claude: ✅ Caso #18044 finalizado com sucesso!
+```
+
+---
+
+## 📋 Fluxo — `/registrar-situacao`
+
+```
+Usuário: /registrar-situacao #18044
+
+Claude:
+  Caso #18044: Título do caso...
+  Qual a situação encontrada?
+
+Usuário: na tela de recebimentos nao ta aceitando cnpj com letra
+
+Claude:
+  Situação 2:
+  Na tela de Recebimentos, não está sendo possível informar um CNPJ alfanumérico.
+
+  A descrição está correta? Posso registrar no caso?
+
+  📎 Lembre-se: se houver imagem, ela deve ser anexada como arquivo
+  (arraste até a conversa). Prints com Ctrl+V não funcionam.
+
+  Vai anexar alguma imagem?
+
+Usuário: Sim [arrasta arquivo]
+
+Claude: ✅ Situação registrada com imagem no caso #18044!
 ```
 
 ---
