@@ -243,5 +243,6 @@ QA-FS-Redmine/
 ---
 
 <div align="center">
-  <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub>
+  <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
+  <sub>Última atualização: 01/07/2026 às 11:00</sub>
 </div>
