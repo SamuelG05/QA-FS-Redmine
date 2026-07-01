@@ -294,8 +294,23 @@ $temPlano = $issue.issue.journals | Where-Object { $_.notes -match "PLANO DE TES
      - Se sim: peça o novo valor
      - Se não: mantenha o valor atual
 
-6. **Finalizar como Resolvido:**
-   > "Posso marcar a issue como Resolvido?"
+6. **Identificar o desenvolvedor** — procure nos journals quem foi o último a mover o caso para "Em Desenvol." (status_id = 3) ou "Liber. Testes" (status_id = 4):
+```powershell
+$devJournal = $issue.issue.journals | Where-Object {
+    $_.details | Where-Object { $_.name -eq "status_id" -and $_.new_value -in @("3", "4") }
+} | Select-Object -Last 1
+
+$devUser = $devJournal.user
+```
+
+   Exiba ao usuário:
+   > "O desenvolvedor identificado foi **<devUser.name>**. Deseja atribuir o caso a ele ao resolver?"
+
+   - Se **sim**: use `$devUser.id` como `assigned_to_id`
+   - Se **não**: pergunte para quem deseja atribuir
+
+7. **Finalizar como Resolvido:**
+   > "Posso marcar o caso como Resolvido?"
    - Se **não**: encerre sem alterar o status
    - Se **sim**: busque o ID do status "Resolvido":
 ```powershell
