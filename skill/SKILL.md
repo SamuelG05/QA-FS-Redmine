@@ -323,6 +323,57 @@ Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $h
 
 ---
 
+### /refinar-caso
+Registra a pontuação de refinamento de uma issue (Dev, Teste e Cenário) como nota no Redmine.
+
+**Fluxo:**
+
+1. Se o número da issue não foi informado, peça: *"Qual o número da issue? (#)"*
+
+2. Busque o título da issue para confirmar:
+```powershell
+$headers = @{ "X-Redmine-API-Key" = $config.api_key }
+$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Headers $headers
+```
+Exiba: **#id — Título da issue**
+
+3. Pergunte a pontuação. Aceite qualquer formato:
+   > "Qual a pontuação do refinamento? (Dev, Teste, Cenário — ex: `1, 6, sim` ou uma por linha)"
+
+   Formatos aceitos:
+   - `1, 6, sim` → Dev=1, Teste=6, Cenário=Sim
+   - `1, 6, não` → Dev=1, Teste=6, Cenário=Não
+   - Três linhas separadas:
+     ```
+     1
+     6
+     Sim
+     ```
+
+4. Monte a nota no formato de tabela Textile:
+
+```
+|  | *Pontuação* |
+| *Dev* | 1 |
+| *Teste* | 6 |
+| *Cenário* | Sim |
+```
+
+5. Exiba a tabela gerada e pergunte:
+   > "Está correto? Posso registrar na issue?"
+
+   - **Se não:** peça as correções e remonte
+   - **Se sim:** poste como nota na issue:
+```powershell
+$headers["Content-Type"] = "application/json"
+$body = @{ issue = @{ notes = "<tabela gerada>" } } | ConvertTo-Json -Depth 5
+Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
+```
+
+6. Confirme o sucesso com o título da issue.
+
+---
+
 ## Observações gerais
 
 - Sempre exibir o **título** da issue nas respostas

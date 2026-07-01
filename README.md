@@ -13,6 +13,7 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar issues,
 | `/inicia-teste` | Atribui a issue ao usuário logado e muda o status para **Em Testes** |
 | `/plano-teste` | Lê toda a documentação da issue e gera um **Plano de Teste** completo no padrão da equipe |
 | `/finalizar-caso` | Verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
+| `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela na issue |
 
 ---
 
@@ -136,6 +137,32 @@ Claude:
 Usuário: Sim
 
 Claude: ✅ Caso #18044 finalizado com sucesso!
+```
+
+---
+
+## 📋 Fluxo — `/refinar-caso`
+
+```
+Usuário: /refinar-caso #18044
+
+Claude:
+  Issue #18044: Título da issue...
+  Qual a pontuação do refinamento? (Dev, Teste, Cenário)
+
+Usuário: 1, 6, sim
+
+Claude:
+  |  | Pontuação |
+  | Dev | 1 |
+  | Teste | 6 |
+  | Cenário | Sim |
+
+  Está correto? Posso registrar na issue?
+
+Usuário: Sim
+
+Claude: ✅ Refinamento registrado na issue #18044!
 ```
 
 ---
