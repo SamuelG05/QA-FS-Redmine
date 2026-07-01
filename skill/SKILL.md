@@ -35,13 +35,19 @@ $config = Get-Content $configPath -Raw | ConvertFrom-Json
 
 ---
 
+## Terminologia
+
+> **Importante:** a equipe utiliza o termo **"caso"** para se referir a uma issue do Redmine. Sempre use "caso" nas perguntas e respostas ao usuário — nunca "issue". Exemplos: "Qual o número do caso?", "O caso foi atualizado com sucesso!", "Não encontrei o caso informado."
+
+---
+
 ## Comandos disponíveis
 
 ### /inicia-teste
 Atribui uma issue ao usuário logado e muda o status para "Em Testes".
 
 **Fluxo:**
-1. Se o número da issue não foi informado, peça: *"Qual o número da issue? (#)"*
+1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
 2. Busque os dados atuais da issue:
 ```powershell
 $headers = @{ "X-Redmine-API-Key" = $config.api_key }
@@ -71,7 +77,7 @@ Lê toda a documentação de uma issue no Redmine e gera um Plano de Teste compl
 
 **Fluxo:**
 
-1. Se o número da issue não foi informado, peça: *"Qual o número da issue? (#)"*
+1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
 
 2. Busque os dados completos da issue incluindo journals e anexos:
 ```powershell
@@ -224,7 +230,7 @@ Consolida o encerramento de uma issue: verifica se o plano de teste existe, cons
 
 **Fluxo:**
 
-1. Se o número da issue não foi informado, peça: *"Qual o número da issue? (#)"*
+1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
 
 2. Busque os dados completos da issue incluindo journals e campos customizados:
 ```powershell
@@ -328,7 +334,7 @@ Registra a pontuação de refinamento de uma issue (Dev, Teste e Cenário) como 
 
 **Fluxo:**
 
-1. Se o número da issue não foi informado, peça: *"Qual o número da issue? (#)"*
+1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
 
 2. Busque o título da issue para confirmar:
 ```powershell
