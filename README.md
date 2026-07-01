@@ -2,16 +2,17 @@
 
 > Skill do Claude para automação de processos de Q.A no Redmine.
 
-Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar issues, iniciar testes e gerar planos de teste documentados — tudo sem sair da conversa.
+Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar issues, iniciar testes, gerar planos de teste e finalizar casos — tudo sem sair da conversa.
 
 ---
 
-## ✨ Funcionalidades
+## ✨ Comandos
 
 | Comando | Descrição |
 |---|---|
 | `/inicia-teste` | Atribui a issue ao usuário logado e muda o status para **Em Testes** |
 | `/plano-teste` | Lê toda a documentação da issue e gera um **Plano de Teste** completo no padrão da equipe |
+| `/finalizar-caso` | Verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
 
 ---
 
@@ -54,8 +55,11 @@ Claude: ✅ Alterações aplicadas com sucesso!
 Usuário: /plano-teste #18001
 
 Claude: [lê descrição do dev + notas do QA no Redmine]
-        [gera plano completo em formato Textile]
+        Quais testes foram feitos?
 
+Usuário: [descreve telas testadas, situações encontradas e resultado]
+
+Claude: [gera plano completo em formato Textile]
         O plano está aprovado? Deseja documentar na issue?
 
 Usuário: Sim
@@ -86,6 +90,56 @@ O plano gerado segue o formato **Textile** nativo do Redmine com as seções:
 
 ---
 
+## 📋 Fluxo — `/finalizar-caso`
+
+```
+Usuário: /finalizar-caso #18044
+
+Claude:
+  Issue #18044: Título da issue...
+  Status atual: Em Testes
+  Tamanho SP: 7
+
+  ⚠️ Nenhum Plano de Teste encontrado. Deseja gerar antes de finalizar?
+
+Usuário: Não
+
+Claude:
+  CheckList Resolvido — marque os itens aplicáveis:
+  1. Análise de Risco
+  2. Teste exploratório
+  3. Criação dos cenários
+  4. Automação dos testes
+  5. Execução da Automação
+
+  Quais deseja marcar?
+
+Usuário: todos
+
+Claude:
+  O Tamanho SP está como 7. Deseja ajustar?
+
+Usuário: Não
+
+Claude:
+  Posso marcar a issue como Resolvido?
+
+Usuário: Sim
+
+Claude:
+  Resumo das alterações:
+  - Status: Em Testes → Resolvido
+  - CheckList: todos os 5 itens marcados
+  - Tamanho SP: 7 (mantido)
+  Confirma?
+
+Usuário: Sim
+
+Claude: ✅ Caso #18044 finalizado com sucesso!
+```
+
+---
+
 ## 🔒 Segurança
 
 - Nenhuma credencial é armazenada na skill ou no repositório
@@ -99,18 +153,28 @@ O plano gerado segue o formato **Textile** nativo do Redmine com as seções:
 ```
 QA-FS-Redmine/
 ├── README.md
+├── QA-FS-Redmine.skill   ← instale direto no Claude Desktop
 └── skill/
-    └── SKILL.md       ← instrução da skill para o Claude
+    └── SKILL.md          ← instrução da skill para o Claude
 ```
 
 ---
 
-## 🚀 Como instalar a skill
+## 🚀 Como instalar
 
-1. Abra o **Claude Desktop**
-2. Vá em **Configurações → Skills**
-3. Adicione a pasta `skill/` deste repositório
-4. Use `/inicia-teste` ou `/plano-teste` em qualquer conversa
+### Opção 1 — Arquivo `.skill` (recomendado)
+
+1. Baixe o arquivo [`QA-FS-Redmine.skill`](./QA-FS-Redmine.skill)
+2. Abra o **Claude Desktop**
+3. Vá em **Configurações → Skills → Instalar**
+4. Selecione o arquivo `.skill` baixado
+
+### Opção 2 — Pasta manual
+
+1. Clone este repositório
+2. Abra o **Claude Desktop**
+3. Vá em **Configurações → Skills → Adicionar pasta**
+4. Selecione a pasta `skill/` deste repositório
 
 ---
 
