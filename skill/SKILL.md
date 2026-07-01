@@ -311,17 +311,26 @@ Issue #<id>: <título>
 - Tamanho SP: <atual> → <novo valor>
 ```
 
-9. Aplique tudo em uma única chamada incluindo status, checklist e tamanho SP:
+9. Aplique tudo em uma única chamada. Use heredoc com UTF-8 para evitar erro 400 com caracteres especiais e arrays:
 ```powershell
 $headers["Content-Type"] = "application/json"
 
-$customFields = @(
-    @{ id = 126; value = $checklist },         # CheckList Resolvido (array de strings)
-    @{ id = 10;  value = "<tamanho_sp>" }      # Tamanho SP
-)
-$body = @{ issue = @{ status_id = $statusId; custom_fields = $customFields } } | ConvertTo-Json -Depth 5
-Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
+$body = @"
+{
+  "issue": {
+    "status_id": $statusId,
+    "assigned_to_id": <user_id_se_necessario>,
+    "custom_fields": [
+      { "id": 126, "value": ["Análise de risco", "Teste exploratório", "Criação dos cenários", "Automação dos testes", "Execução da Automação"] },
+      { "id": 10, "value": "<tamanho_sp>" }
+    ]
+  }
+}
+"@
+Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
 ```
+
+> ⚠️ Sempre use `[System.Text.Encoding]::UTF8.GetBytes($body)` ao enviar JSON com acentos ou arrays — o `ConvertTo-Json` do PowerShell pode causar erro 400 nesses casos.
 
 9. Confirme o sucesso ao usuário com o título da issue e as alterações aplicadas.
 
