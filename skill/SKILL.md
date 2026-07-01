@@ -99,7 +99,7 @@ $issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journal
 
 ```
 h1. PLANO DE TESTE – Funcionalidade #<id>
-Tema: <Projeto> – <descrição curta com **destaques** nos termos principais>
+Tema: <subject exato do caso buscado da API — nunca resumir ou inventar>
 
 ---
 
@@ -204,6 +204,8 @@ h3. 9. Considerações Finais
 - Usar `**texto**` para negrito em termos técnicos, campos e funcionalidades
 - Usar `---` como separador entre seções
 - Usar `✅` em critérios, situações corrigidas e testes realizados
+- **CRÍTICO:** sempre inserir o emoji `✅` diretamente no texto — NUNCA usar a string `:check_mark:` ou qualquer outra representação textual
+- O campo **Tema** deve ser sempre o `subject` exato do caso buscado da API (ex: `PDV - Trocar os schemas do CNPJ alfanumérico e validar a transmissão`) — nunca resumir ou inventar
 - Casos de teste numerados: CT01, CT02, CT03...
 - Passos numerados: **Passo 01**, **Passo 02**...
 - Todas as situações encontradas sempre marcadas como `✅ **Situação corrigida.**`
