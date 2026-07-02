@@ -212,10 +212,11 @@ Claude: ✅ Refinamento registrado no caso #18044!
 ```
 QA-FS-Redmine/
 ├── README.md
-├── QA-FS-Redmine.skill   ← instale direto no Claude Desktop
+├── QA-FS-Redmine.skill      ← instale direto no Claude Desktop
+├── instalar-comandos.bat    ← instala os comandos no Claude Code (Windows)
 ├── skill/
-│   └── SKILL.md          ← instrução da skill para o Claude
-└── commands/             ← slash commands para o Claude Code
+│   └── SKILL.md             ← instrução da skill para o Claude
+└── commands/                ← slash commands para o Claude Code
     ├── inicia-teste.md
     ├── plano-teste.md
     ├── registrar-situacao.md
@@ -251,6 +252,10 @@ QA-FS-Redmine/
 
 No **Claude Code**, slash commands de skills não são reconhecidos nativamente. Para que `/inicia-teste`, `/plano-teste`, `/registrar-situacao`, `/finalizar-caso` e `/refinar-caso` funcionem como comandos nativos, copie os arquivos da pasta `commands/` para `~/.claude/commands/`:
 
+**Windows — instalador automático (recomendado):**
+
+Dê dois cliques no arquivo [`instalar-comandos.bat`](./instalar-comandos.bat) na raiz do repositório.
+
 **Windows (PowerShell):**
 ```powershell
 Copy-Item ".\commands\*.md" "$env:USERPROFILE\.claude\commands\" -Force
@@ -267,5 +272,5 @@ cp commands/*.md ~/.claude/commands/
 
 <div align="center">
   <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 02/07/2026 às 11:30</sub>
+  <sub>Última atualização: 02/07/2026 às 14:00</sub>
 </div>
