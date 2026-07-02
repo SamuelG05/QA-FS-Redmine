@@ -1,248 +1,271 @@
-# 🧪 QA-FS-Redmine
+﻿# ðŸ§ª QA-FS-Redmine
 
-> Skill do Claude para automação de processos de Q.A no Redmine.
+> Skill do Claude para automaÃ§Ã£o de processos de Q.A no Redmine.
 
-Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, iniciar testes, gerar planos de teste, registrar situações e finalizar casos — tudo sem sair da conversa.
+Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, iniciar testes, gerar planos de teste, registrar situaÃ§Ãµes e finalizar casos â€” tudo sem sair da conversa.
 
 ---
 
-## ✨ Comandos
+## âœ¨ Comandos
 
-| Comando | Descrição |
+| Comando | DescriÃ§Ã£o |
 |---|---|
-| `/inicia-teste` | Atribui o caso ao usuário logado e muda o status para **Em Testes** |
-| `/plano-teste` | Lê toda a documentação do caso e gera um **Plano de Teste** completo no padrão da equipe |
-| `/registrar-situacao` | Formata e registra uma situação encontrada durante os testes, com suporte a anexo de imagem |
+| `/inicia-teste` | Atribui o caso ao usuÃ¡rio logado e muda o status para **Em Testes** |
+| `/plano-teste` | LÃª toda a documentaÃ§Ã£o do caso e gera um **Plano de Teste** completo no padrÃ£o da equipe |
+| `/registrar-situacao` | Formata e registra uma situaÃ§Ã£o encontrada durante os testes, com suporte a anexo de imagem |
 | `/finalizar-caso` | Identifica o dev, verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
-| `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela no caso |
+| `/refinar-caso` | Registra a pontuaÃ§Ã£o de refinamento (Dev, Teste e CenÃ¡rio) como tabela no caso |
 
 ---
 
-## ⚙️ Configuração
+## âš™ï¸ ConfiguraÃ§Ã£o
 
-Na primeira execução, a skill solicita:
+Na primeira execuÃ§Ã£o, a skill solicita:
 - **URL base** do Redmine (ex: `https://redmine.suaempresa.com`)
-- **API Key** do usuário
+- **API Key** do usuÃ¡rio
 
-As credenciais são salvas localmente em:
+As credenciais sÃ£o salvas localmente em:
 ```
 C:\Users\<usuario>\Documents\QA-FS-Redmine\config.json
 ```
 
-> ⚠️ O arquivo `config.json` **nunca deve ser commitado**. Ele fica apenas na sua máquina.
+> âš ï¸ O arquivo `config.json` **nunca deve ser commitado**. Ele fica apenas na sua mÃ¡quina.
 
 ---
 
-## 📋 Fluxo — `/inicia-teste`
+## ðŸ“‹ Fluxo â€” `/inicia-teste`
 
 ```
-Usuário: /inicia-teste #18072
+UsuÃ¡rio: /inicia-teste #18072
 
 Claude:
-  Caso #18072: Título do caso...
-  Status atual: Liber. Testes → Em Testes
-  Atribuído a: (ninguém) → Seu Nome
-  Confirma as alterações?
+  Caso #18072: TÃ­tulo do caso...
+  Status atual: Liber. Testes â†’ Em Testes
+  AtribuÃ­do a: (ninguÃ©m) â†’ Seu Nome
+  Confirma as alteraÃ§Ãµes?
 
-Usuário: Sim
+UsuÃ¡rio: Sim
 
-Claude: ✅ Alterações aplicadas com sucesso!
+Claude: âœ… AlteraÃ§Ãµes aplicadas com sucesso!
 ```
 
 ---
 
-## 📋 Fluxo — `/plano-teste`
+## ðŸ“‹ Fluxo â€” `/plano-teste`
 
 ```
-Usuário: /plano-teste #18001
+UsuÃ¡rio: /plano-teste #18001
 
-Claude: [lê descrição do dev + notas do QA no Redmine]
+Claude: [lÃª descriÃ§Ã£o do dev + notas do QA no Redmine]
         Quais testes foram feitos?
 
-Usuário: [descreve telas testadas, situações encontradas e resultado]
+UsuÃ¡rio: [descreve telas testadas, situaÃ§Ãµes encontradas e resultado]
 
 Claude: [gera plano completo em formato Textile]
-        O plano está aprovado? Deseja documentar no caso?
+        O plano estÃ¡ aprovado? Deseja documentar no caso?
 
-Usuário: Sim
+UsuÃ¡rio: Sim
 
 Claude: Deseja ajustar algo antes de postar?
-        (status, atribuição, texto...)
+        (status, atribuiÃ§Ã£o, texto...)
 
-Usuário: Não, pode postar
+UsuÃ¡rio: NÃ£o, pode postar
 
-Claude: ✅ Plano de teste postado no caso #18001!
+Claude: âœ… Plano de teste postado no caso #18001!
 ```
 
 ---
 
-## 📄 Padrão do Plano de Teste
+## ðŸ“„ PadrÃ£o do Plano de Teste
 
-O plano gerado segue o formato **Textile** nativo do Redmine com as seções:
+O plano gerado segue o formato **Textile** nativo do Redmine com as seÃ§Ãµes:
 
 1. Objetivo do Teste
 2. Escopo do Teste
 3. Premissas
 4. Riscos
-5. Critérios de Aceitação
+5. CritÃ©rios de AceitaÃ§Ã£o
 6. Casos de Teste (CT01, CT02...)
-7. Situações Encontradas Durante os Testes
+7. SituaÃ§Ãµes Encontradas Durante os Testes
 8. Testes Realizados
-9. Considerações Finais
+9. ConsideraÃ§Ãµes Finais
 
 ---
 
-## 📋 Fluxo — `/registrar-situacao`
+## ðŸ“‹ Fluxo â€” `/registrar-situacao`
 
 ```
-Usuário: /registrar-situacao #18044
+UsuÃ¡rio: /registrar-situacao #18044
 
 Claude:
-  Caso #18044: Título do caso...
-  Qual a situação encontrada?
+  Caso #18044: TÃ­tulo do caso...
+  Qual a situaÃ§Ã£o encontrada?
 
-Usuário: na tela de recebimentos nao ta aceitando cnpj com letra
+UsuÃ¡rio: na tela de recebimentos nao ta aceitando cnpj com letra
 
 Claude:
-  Situação 2:
-  Na tela de Recebimentos, não está sendo possível informar um CNPJ alfanumérico.
+  SituaÃ§Ã£o 2:
+  Na tela de Recebimentos, nÃ£o estÃ¡ sendo possÃ­vel informar um CNPJ alfanumÃ©rico.
 
-  A descrição está correta? Posso registrar no caso?
+  A descriÃ§Ã£o estÃ¡ correta? Posso registrar no caso?
 
-  📎 Lembre-se: se houver imagem, ela deve ser anexada como arquivo
-  (arraste até a conversa). Prints com Ctrl+V não funcionam.
+  ðŸ“Ž Lembre-se: se houver imagem, ela deve ser anexada como arquivo
+  (arraste atÃ© a conversa). Prints com Ctrl+V nÃ£o funcionam.
 
   Vai anexar alguma imagem?
 
-Usuário: Sim [arrasta arquivo]
+UsuÃ¡rio: Sim [arrasta arquivo]
 
-Claude: ✅ Situação registrada com imagem no caso #18044!
+Claude: âœ… SituaÃ§Ã£o registrada com imagem no caso #18044!
 ```
 
 ---
 
-## 📋 Fluxo — `/finalizar-caso`
+## ðŸ“‹ Fluxo â€” `/finalizar-caso`
 
 ```
-Usuário: /finalizar-caso #18044
+UsuÃ¡rio: /finalizar-caso #18044
 
 Claude:
-  Caso #18044: Título do caso...
+  Caso #18044: TÃ­tulo do caso...
   Status atual: Em Testes
   Tamanho SP: 7
 
-  ⚠️ Nenhum Plano de Teste encontrado. Deseja gerar antes de finalizar?
+  âš ï¸ Nenhum Plano de Teste encontrado. Deseja gerar antes de finalizar?
 
-Usuário: Não
+UsuÃ¡rio: NÃ£o
 
 Claude:
-  CheckList Resolvido — marque os itens aplicáveis:
-  1. Análise de Risco
-  2. Teste exploratório
-  3. Criação dos cenários
-  4. Automação dos testes
-  5. Execução da Automação
+  CheckList Resolvido â€” marque os itens aplicÃ¡veis:
+  1. AnÃ¡lise de Risco
+  2. Teste exploratÃ³rio
+  3. CriaÃ§Ã£o dos cenÃ¡rios
+  4. AutomaÃ§Ã£o dos testes
+  5. ExecuÃ§Ã£o da AutomaÃ§Ã£o
 
   Quais deseja marcar?
 
-Usuário: Todos
+UsuÃ¡rio: Todos
 
 Claude:
-  O Tamanho SP está como 7. Deseja ajustar?
+  O Tamanho SP estÃ¡ como 7. Deseja ajustar?
 
-Usuário: Não
+UsuÃ¡rio: NÃ£o
 
 Claude:
   O desenvolvedor identificado foi [Nome do Dev].
   Deseja atribuir o caso a ele ao resolver?
 
-Usuário: Sim
+UsuÃ¡rio: Sim
 
 Claude:
   Posso marcar o caso como Resolvido?
 
-Usuário: Sim
+UsuÃ¡rio: Sim
 
 Claude:
-  Resumo das alterações:
-  - Status: Em Testes → Resolvido
-  - Atribuído a: [QA] → [Nome do Dev]
+  Resumo das alteraÃ§Ãµes:
+  - Status: Em Testes â†’ Resolvido
+  - AtribuÃ­do a: [QA] â†’ [Nome do Dev]
   - CheckList: todos os 5 itens marcados
   - Tamanho SP: 7 (mantido)
   Confirma?
 
-Usuário: Sim
+UsuÃ¡rio: Sim
 
-Claude: ✅ Caso #18044 finalizado com sucesso!
+Claude: âœ… Caso #18044 finalizado com sucesso!
 ```
 
 ---
 
-## 📋 Fluxo — `/refinar-caso`
+## ðŸ“‹ Fluxo â€” `/refinar-caso`
 
 ```
-Usuário: /refinar-caso #18044
+UsuÃ¡rio: /refinar-caso #18044
 
 Claude:
-  Caso #18044: Título do caso...
-  Qual a pontuação do refinamento? (Dev, Teste, Cenário)
+  Caso #18044: TÃ­tulo do caso...
+  Qual a pontuaÃ§Ã£o do refinamento? (Dev, Teste, CenÃ¡rio)
 
-Usuário: 1, 6, sim
+UsuÃ¡rio: 1, 6, sim
 
 Claude:
-  |  | Pontuação |
+  |  | PontuaÃ§Ã£o |
   | Dev | 1 |
   | Teste | 6 |
-  | Cenário | Sim |
+  | CenÃ¡rio | Sim |
 
-  Está correto? Posso registrar no caso?
+  EstÃ¡ correto? Posso registrar no caso?
 
-Usuário: Sim
+UsuÃ¡rio: Sim
 
-Claude: ✅ Refinamento registrado no caso #18044!
+Claude: âœ… Refinamento registrado no caso #18044!
 ```
 
 ---
 
-## 🔒 Segurança
+## ðŸ”’ SeguranÃ§a
 
-- Nenhuma credencial é armazenada na skill ou no repositório
-- O Claude **nunca executa ações no Redmine sem aprovação explícita** do usuário
-- O `config.json` é gerado localmente e fica apenas na máquina do usuário
+- Nenhuma credencial Ã© armazenada na skill ou no repositÃ³rio
+- O Claude **nunca executa aÃ§Ãµes no Redmine sem aprovaÃ§Ã£o explÃ­cita** do usuÃ¡rio
+- O `config.json` Ã© gerado localmente e fica apenas na mÃ¡quina do usuÃ¡rio
 
 ---
 
-## 📁 Estrutura do Repositório
+## ðŸ“ Estrutura do RepositÃ³rio
 
 ```
 QA-FS-Redmine/
-├── README.md
-├── QA-FS-Redmine.skill   ← instale direto no Claude Desktop
-└── skill/
-    └── SKILL.md          ← instrução da skill para o Claude
+â”œâ”€â”€ README.md
+â”œâ”€â”€ QA-FS-Redmine.skill   â† instale direto no Claude Desktop
+â””â”€â”€ skill/
+    â””â”€â”€ SKILL.md          â† instruÃ§Ã£o da skill para o Claude
 ```
 
 ---
 
-## 🚀 Como instalar
+## ðŸš€ Como instalar
 
-### Opção 1 — Arquivo `.skill` (recomendado)
+### Claude Desktop
+
+#### OpÃ§Ã£o 1 â€” Arquivo `.skill` (recomendado)
 
 1. Baixe o arquivo [`QA-FS-Redmine.skill`](./QA-FS-Redmine.skill)
 2. Abra o **Claude Desktop**
-3. Vá em **Configurações → Skills → Instalar**
+3. VÃ¡ em **ConfiguraÃ§Ãµes â†’ Skills â†’ Instalar**
 4. Selecione o arquivo `.skill` baixado
 
-### Opção 2 — Pasta manual
+> Na primeira vez que a skill for carregada, ela instala automaticamente os slash commands no Claude Code (veja abaixo).
 
-1. Clone este repositório
+#### OpÃ§Ã£o 2 â€” Pasta manual
+
+1. Clone este repositÃ³rio
 2. Abra o **Claude Desktop**
-3. Vá em **Configurações → Skills → Adicionar pasta**
-4. Selecione a pasta `skill/` deste repositório
+3. VÃ¡ em **ConfiguraÃ§Ãµes â†’ Skills â†’ Adicionar pasta**
+4. Selecione a pasta `skill/` deste repositÃ³rio
+
+---
+
+### Claude Code (CLI)
+
+No **Claude Code**, slash commands de skills nÃ£o sÃ£o reconhecidos nativamente. Para que `/inicia-teste`, `/plano-teste`, `/registrar-situacao`, `/finalizar-caso` e `/refinar-caso` funcionem como comandos nativos, copie os arquivos da pasta `commands/` para `~/.claude/commands/`:
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item ".\commands\*.md" "$env:USERPROFILE\.claude\commands\" -Force
+```
+
+**Mac/Linux:**
+```bash
+cp commands/*.md ~/.claude/commands/
+```
+
+> **Alternativa automÃ¡tica:** se vocÃª tiver a skill instalada no Claude Desktop, ela detecta a ausÃªncia dos arquivos na primeira execuÃ§Ã£o e os cria automaticamente.
 
 ---
 
 <div align="center">
-  <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 02/07/2026 às 11:00</sub>
+  <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel GonÃ§alves</a></sub><br>
+  <sub>Ãšltima atualizaÃ§Ã£o: 02/07/2026 Ã s 11:00</sub>
 </div>
+

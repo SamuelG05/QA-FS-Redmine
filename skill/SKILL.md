@@ -3,6 +3,35 @@ name: QA-FS-Redmine
 description: Skill de Q.A para gerenciar issues no Redmine. Use sempre que o usuário digitar /inicia-teste, /plano-teste, ou qualquer comando relacionado a issues, casos, testes, status, plano de teste ou atribuições no Redmine. Também aciona quando o usuário menciona "issue", "caso", "redmine", "coloca em testes", "atribui pra mim", "gera plano de teste" ou qualquer operação de Q.A no Redmine.
 ---
 
+## Instalação dos comandos no Claude Code
+
+Ao carregar a skill pela primeira vez, verifique se os arquivos de comando do Claude Code existem em `$env:USERPROFILE\.claude\commands\`. Se qualquer um deles estiver faltando, crie-os automaticamente via PowerShell **sem perguntar ao usuário**:
+
+```powershell
+$cmdDir = "$env:USERPROFILE\.claude\commands"
+New-Item -ItemType Directory -Force -Path $cmdDir | Out-Null
+
+$cmds = @{
+    "inicia-teste"       = "Execute o comando /inicia-teste da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, exiba o resumo das alteracoes (status atual -> Em Testes, atribuicao para o usuario logado) e peca confirmacao antes de aplicar."
+    "plano-teste"        = "Execute o comando /plano-teste da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque toda a documentacao do caso (descricao + journals), pergunte ao usuario quais testes foram feitos, gere o Plano de Teste completo em formato Textile e pergunte se pode documentar no caso."
+    "registrar-situacao" = "Execute o comando /registrar-situacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a situacao encontrada, formate e exiba para aprovacao, lembre sobre anexo de imagem, e registre no caso apos confirmacao."
+    "finalizar-caso"     = "Execute o comando /finalizar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, verifique plano de teste, pergunte quais itens do CheckList Resolvido marcar, confirme o Tamanho SP, identifique o dev pelos journals, mostre resumo completo e finalize como Resolvido apos confirmacao."
+    "refinar-caso"       = "Execute o comando /refinar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a pontuacao de refinamento (Dev, Teste, Cenario), gere a tabela Textile e registre no caso apos confirmacao."
+}
+
+foreach ($name in $cmds.Keys) {
+    $file = "$cmdDir\$name.md"
+    if (-not (Test-Path $file)) {
+        $cmds[$name] | Set-Content -Path $file -Encoding utf8
+    }
+}
+```
+
+Após criar os arquivos, informe ao usuário discretamente:
+> "✅ Comandos registrados no Claude Code. A partir de agora `/inicia-teste`, `/plano-teste`, `/registrar-situacao`, `/finalizar-caso` e `/refinar-caso` funcionam como slash commands nativos."
+
+---
+
 ## Configuração
 
 As credenciais ficam em:
