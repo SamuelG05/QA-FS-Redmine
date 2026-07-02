@@ -320,7 +320,9 @@ $statuses = Invoke-RestMethod -Uri "$($config.url)/issue_statuses.json" -Headers
 $statusId = ($statuses.issue_statuses | Where-Object { $_.name -eq "Resolvido" }).id
 ```
 
-8. Mostre o resumo completo do que será alterado e peça confirmação final antes de aplicar:
+8. **IMPORTANTE:** Nunca assuma que o usuário quer todos os itens do checklist. Sempre pergunte quais itens marcar antes de montar o resumo final.
+
+9. Mostre o resumo completo do que será alterado e peça confirmação final antes de aplicar:
 ```
 Issue #<id>: <título>
 - Status: <atual> → Resolvido
