@@ -412,10 +412,10 @@ Exiba: **#id — Título do caso**
 *Situação <N>:*
 <descrição formatada e melhorada>
 
-!<nome_do_arquivo>!
+!{width:600px}<nome_do_arquivo>!
 ```
 
-> A linha `!nome_do_arquivo!` só é incluída se houver imagem a anexar — ela faz a imagem aparecer inline no Redmine logo abaixo da descrição.
+> A linha `!{width:600px}nome_do_arquivo!` só é incluída se houver imagem a anexar — ela faz a imagem aparecer inline no Redmine logo abaixo da descrição, com largura fixa de 600px (entre 500 e 700px).
 
 6. Exiba a situação formatada ao usuário e pergunte:
    > "A descrição está correta? Posso registrar no caso?"
