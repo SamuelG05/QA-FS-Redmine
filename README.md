@@ -15,6 +15,7 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, 
 | `/registrar-situacao` | Formata e registra uma situação encontrada durante os testes, com suporte a anexo de imagem |
 | `/finalizar-caso` | Identifica o dev, verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
 | `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela no caso |
+| `/criterios-aceitacao` | Lista todos os critérios de aceitação documentados no caso |
 
 ---
 
@@ -221,7 +222,8 @@ QA-FS-Redmine/
     ├── plano-teste.md
     ├── registrar-situacao.md
     ├── finalizar-caso.md
-    └── refinar-caso.md
+    ├── refinar-caso.md
+    └── criterios-aceitacao.md
 ```
 
 ---
@@ -250,7 +252,7 @@ QA-FS-Redmine/
 
 ### Claude Code (CLI)
 
-No **Claude Code**, slash commands de skills não são reconhecidos nativamente. Para que `/inicia-teste`, `/plano-teste`, `/registrar-situacao`, `/finalizar-caso` e `/refinar-caso` funcionem como comandos nativos, copie os arquivos da pasta `commands/` para `~/.claude/commands/`:
+No **Claude Code**, slash commands de skills não são reconhecidos nativamente. Para que `/inicia-teste`, `/plano-teste`, `/registrar-situacao`, `/finalizar-caso`, `/refinar-caso` e `/criterios-aceitacao` funcionem como comandos nativos, copie os arquivos da pasta `commands/` para `~/.claude/commands/`:
 
 **Windows — instalador automático (recomendado):**
 
@@ -272,5 +274,5 @@ cp commands/*.md ~/.claude/commands/
 
 <div align="center">
   <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 02/07/2026 às 11:25</sub>
+  <sub>Última atualização: 06/07/2026 às 15:35</sub>
 </div>

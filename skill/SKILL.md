@@ -17,6 +17,7 @@ $cmds = @{
     "registrar-situacao" = "Execute o comando /registrar-situacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a situacao encontrada, formate e exiba para aprovacao, lembre sobre anexo de imagem, e registre no caso apos confirmacao."
     "finalizar-caso"     = "Execute o comando /finalizar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, verifique plano de teste, pergunte quais itens do CheckList Resolvido marcar, confirme o Tamanho SP, identifique o dev pelos journals, mostre resumo completo e finalize como Resolvido apos confirmacao."
     "refinar-caso"       = "Execute o comando /refinar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a pontuacao de refinamento (Dev, Teste, Cenario), gere a tabela Textile e registre no caso apos confirmacao."
+    "criterios-aceitacao" = "Execute o comando /criterios-aceitacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados completos do caso, localize a secao de criterios de aceitacao na descricao e nos journals, e liste todos os criterios encontrados numerados e formatados."
 }
 
 foreach ($name in $cmds.Keys) {
@@ -496,6 +497,43 @@ Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $h
 ```
 
 6. Confirme o sucesso com o título da issue.
+
+---
+
+### /criterios-aceitacao
+Lista todos os critérios de aceitação disponíveis na documentação do caso.
+
+**Fluxo:**
+
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
+
+2. Busque os dados completos da issue:
+```powershell
+$headers = @{ "X-Redmine-API-Key" = $config.api_key }
+$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journals,attachments" -Headers $headers
+```
+
+3. Procure na `description` da issue por uma seção de critérios de aceitação. Ela pode aparecer como:
+   - `Critérios de aceitação`
+   - `Criterios de aceitacao`
+   - `Critério de aceite`
+   - Lista de itens com `-` ou `*` após um título relacionado a critérios
+
+4. Também verifique nos `journals` se há critérios adicionais registrados pelo dev ou pelo QA.
+
+5. Exiba os critérios encontrados numerados e formatados:
+
+```
+Caso #<id>: <subject>
+
+Critérios de Aceitação:
+1. <critério 1>
+2. <critério 2>
+...
+```
+
+6. Se não houver critérios na documentação, informe:
+   > "Não encontrei critérios de aceitação documentados nesse caso."
 
 ---
 
