@@ -200,6 +200,25 @@ Claude: ✅ Refinamento registrado no caso #18044!
 
 ---
 
+## 📋 Fluxo — `/criterios-aceitacao`
+
+```
+Usuário: /criterios-aceitacao #17776
+
+Claude:
+  Caso #17776: NF-e - Criar Evento Informação de efetivo pagamento...
+
+  Critérios de Aceitação:
+  1. Deverá ter uma tela para fazer os eventos da reforma tributária.
+  2. Deverá ser possível acessar essa tela pelo menu NF-e e por um atalho na tela principal.
+  3. Deverá ter um combo para escolher qual evento será feito.
+  4. Deverá ser possível transmitir o evento 112110.
+  5. Deverá ser possível cancelar o evento 112110.
+  ...
+```
+
+---
+
 ## 🔒 Segurança
 
 - Nenhuma credencial é armazenada na skill ou no repositório
