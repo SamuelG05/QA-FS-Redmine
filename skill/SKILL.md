@@ -406,7 +406,7 @@ Exiba: **#id — Título do caso**
 4. Pergunte a situação:
    > "Qual a situação encontrada?"
 
-5. Formate e melhore a descrição mantendo o conteúdo original, corrigindo gramática e deixando clara e objetiva. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Monte no padrão:
+5. Formate a descrição corrigindo ortografia e gramática, mas mantendo a lógica e o conteúdo exato do que o usuário relatou. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Monte no padrão:
 
 ```
 *Situação <N>:*
