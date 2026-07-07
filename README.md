@@ -19,6 +19,27 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, 
 
 ---
 
+## ⚡ Integração com MCP Redmine
+
+A skill utiliza o **MCP Redmine** para todas as operações — sem scripts PowerShell, sem overhead de processo. As chamadas ao Redmine são feitas diretamente pelo Claude via ferramentas nativas do MCP, tornando as consultas e atualizações muito mais rápidas.
+
+**Ferramentas MCP utilizadas:**
+
+| Ferramenta | O que faz |
+|---|---|
+| `get_issue` | Busca dados do caso com journals, anexos e campos customizados |
+| `get_journals` | Retorna histórico de notas e alterações |
+| `get_current_user` | Identifica o usuário autenticado |
+| `update_issue` | Atualiza status, atribuição e campos customizados |
+| `post_note` | Posta nota no caso com suporte a anexos |
+| `upload_file` | Faz upload de arquivo e retorna token para anexo |
+| `update_journal` | Edita texto de um journal existente |
+| `list_statuses` | Lista os status disponíveis |
+
+> O MCP deve estar configurado com as variáveis de ambiente `REDMINE_URL` e `REDMINE_API_KEY`. Nenhuma credencial é armazenada na skill ou no repositório.
+
+---
+
 ## ⚙️ Configuração
 
 Na primeira execução, a skill solicita:
@@ -293,5 +314,5 @@ cp commands/*.md ~/.claude/commands/
 
 <div align="center">
   <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 06/07/2026 às 15:35</sub>
+  <sub>Última atualização: 07/07/2026 às 10:15</sub>
 </div>
