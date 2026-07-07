@@ -253,7 +253,7 @@ Claude:
 
   Status: Em Testes
   Atribuído a: Samuel Gonçalves
-  Autor: José Inácio Carvalho
+  Autor: Dev Responsável
   Criado em: 09/02/2026
   Atualizado em: 07/07/2026
 
