@@ -3,7 +3,22 @@ name: QA-FS-Redmine
 description: Skill de Q.A para gerenciar issues no Redmine. Use sempre que o usuário digitar /inicia-teste, /plano-teste, ou qualquer comando relacionado a issues, casos, testes, status, plano de teste ou atribuições no Redmine. Também aciona quando o usuário menciona "issue", "caso", "redmine", "coloca em testes", "atribui pra mim", "gera plano de teste" ou qualquer operação de Q.A no Redmine.
 ---
 
-## Pré-requisito: MCP Redmine
+## Modo de operação
+
+Na **primeira execução da sessão**, pergunte ao usuário:
+
+> "O MCP Redmine está configurado e ativo? (ele aparece como ferramenta disponível no Claude)
+> - **Sim** → a skill usará o MCP para todas as operações (mais rápido)
+> - **Não** → a skill usará PowerShell como fallback"
+
+Salve a resposta em memória para não perguntar novamente na mesma sessão.
+
+- Se **MCP ativo**: use as ferramentas `get_issue`, `post_note`, `upload_file`, etc. conforme descrito abaixo
+- Se **PowerShell**: leia as credenciais de `$env:USERPROFILE\Documents\QA-FS-Redmine\config.json` e use `Invoke-RestMethod` com o header `X-Redmine-API-Key`
+
+---
+
+## MCP Redmine — ferramentas disponíveis (quando ativo)
 
 Esta skill utiliza o MCP `redmine` para todas as operações. As ferramentas disponíveis são:
 
@@ -365,6 +380,43 @@ Critérios de Aceitação:
 
 6. Se não houver critérios documentados, informe:
    > "Não encontrei critérios de aceitação documentados nesse caso."
+
+---
+
+## Fallback PowerShell (quando MCP não está ativo)
+
+Quando o MCP não estiver disponível, use PowerShell para todas as operações. Leia o config:
+
+```powershell
+$configPath = "$env:USERPROFILE\Documents\QA-FS-Redmine\config.json"
+$config = Get-Content $configPath -Raw | ConvertFrom-Json
+# $config.url | $config.api_key | $config.user_id | $config.user_name
+$headers = @{ "X-Redmine-API-Key" = $config.api_key }
+```
+
+**Se o config.json não existir (primeira vez):** peça a URL base e a API Key, busque o usuário atual e salve:
+```powershell
+$configDir = "$env:USERPROFILE\Documents\QA-FS-Redmine"
+New-Item -ItemType Directory -Force -Path $configDir | Out-Null
+$headers = @{ "X-Redmine-API-Key" = "<api_key>" }
+$u = (Invoke-RestMethod -Uri "<url>/users/current.json" -Headers $headers).user
+$config = @{ url = "<url>"; api_key = "<api_key>"; user_id = $u.id; user_name = "$($u.firstname) $($u.lastname)" } | ConvertTo-Json
+$config | Set-Content -Path "$configDir\config.json" -Encoding utf8
+```
+
+**Equivalências PowerShell por operação:**
+
+| Operação MCP | Equivalente PowerShell |
+|---|---|
+| `get_issue(id, include)` | `Invoke-RestMethod "$($config.url)/issues/$id.json?include=journals,attachments,custom_fields" -Headers $headers` |
+| `get_current_user()` | `Invoke-RestMethod "$($config.url)/users/current.json" -Headers $headers` |
+| `list_statuses()` | `Invoke-RestMethod "$($config.url)/issue_statuses.json" -Headers $headers` |
+| `post_note(id, notes)` | `Invoke-RestMethod "$($config.url)/issues/$id.json" -Method Put -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($body))` |
+| `upload_file(path)` | `POST /uploads.json` com `Content-Type: application/octet-stream` e `[System.IO.File]::ReadAllBytes(path)` |
+| `update_journal(id, notes)` | `PUT /journals/$id.json` com `{"journal":{"notes":"..."}}` |
+| `update_issue(id, custom_fields)` | `PUT /issues/$id.json` com heredoc UTF-8 para evitar erro 400 com arrays e acentos |
+
+> ⚠️ Sempre use `[System.Text.Encoding]::UTF8.GetBytes($body)` ao enviar JSON com acentos ou arrays no PowerShell.
 
 ---
 
