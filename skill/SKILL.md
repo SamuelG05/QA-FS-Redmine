@@ -3,6 +3,27 @@ name: QA-FS-Redmine
 description: Skill de Q.A para gerenciar issues no Redmine. Use sempre que o usuário digitar /inicia-teste, /plano-teste, ou qualquer comando relacionado a issues, casos, testes, status, plano de teste ou atribuições no Redmine. Também aciona quando o usuário menciona "issue", "caso", "redmine", "coloca em testes", "atribui pra mim", "gera plano de teste" ou qualquer operação de Q.A no Redmine.
 ---
 
+## Pré-requisito: MCP Redmine
+
+Esta skill utiliza o MCP `redmine` para todas as operações. As ferramentas disponíveis são:
+
+| Ferramenta | O que faz |
+|---|---|
+| `get_issue(id, include)` | Busca dados do caso. `include`: `journals`, `attachments`, `custom_fields` |
+| `get_journals(id)` | Retorna journals com notas e histórico de alterações |
+| `get_current_user()` | Retorna id e nome do usuário autenticado |
+| `update_issue(id, ...)` | Atualiza status, atribuição, campos customizados, etc |
+| `post_note(id, notes, upload_tokens)` | Posta nota no caso com suporte a anexos |
+| `upload_file(file_path, content_type)` | Faz upload de arquivo e retorna token |
+| `update_journal(journal_id, notes)` | Edita texto de um journal existente |
+| `list_statuses()` | Lista IDs e nomes dos status disponíveis |
+
+**IDs fixos já conhecidos:**
+- Status Em Testes = **5** | Resolvido = **7** | Em Desenvol. = **3** | Liber. Testes = **4**
+- Campo CheckList Resolvido = **ID 126** | Tamanho SP = **ID 10**
+
+---
+
 ## Instalação dos comandos no Claude Code
 
 Ao carregar a skill pela primeira vez, verifique se os arquivos de comando do Claude Code existem em `$env:USERPROFILE\.claude\commands\`. Se qualquer um deles estiver faltando, crie-os automaticamente via PowerShell **sem perguntar ao usuário**:
@@ -12,11 +33,11 @@ $cmdDir = "$env:USERPROFILE\.claude\commands"
 New-Item -ItemType Directory -Force -Path $cmdDir | Out-Null
 
 $cmds = @{
-    "inicia-teste"       = "Execute o comando /inicia-teste da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, exiba o resumo das alteracoes (status atual -> Em Testes, atribuicao para o usuario logado) e peca confirmacao antes de aplicar."
-    "plano-teste"        = "Execute o comando /plano-teste da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque toda a documentacao do caso (descricao + journals), pergunte ao usuario quais testes foram feitos, gere o Plano de Teste completo em formato Textile e pergunte se pode documentar no caso."
-    "registrar-situacao" = "Execute o comando /registrar-situacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a situacao encontrada, formate e exiba para aprovacao, lembre sobre anexo de imagem, e registre no caso apos confirmacao."
-    "finalizar-caso"     = "Execute o comando /finalizar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, verifique plano de teste, pergunte quais itens do CheckList Resolvido marcar, confirme o Tamanho SP, identifique o dev pelos journals, mostre resumo completo e finalize como Resolvido apos confirmacao."
-    "refinar-caso"       = "Execute o comando /refinar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a pontuacao de refinamento (Dev, Teste, Cenario), gere a tabela Textile e registre no caso apos confirmacao."
+    "inicia-teste"        = "Execute o comando /inicia-teste da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, exiba o resumo das alteracoes (status atual -> Em Testes, atribuicao para o usuario logado) e peca confirmacao antes de aplicar."
+    "plano-teste"         = "Execute o comando /plano-teste da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque toda a documentacao do caso (descricao + journals), pergunte ao usuario quais testes foram feitos, gere o Plano de Teste completo em formato Textile e pergunte se pode documentar no caso."
+    "registrar-situacao"  = "Execute o comando /registrar-situacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a situacao encontrada, formate e exiba para aprovacao, lembre sobre anexo de imagem, e registre no caso apos confirmacao."
+    "finalizar-caso"      = "Execute o comando /finalizar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, verifique plano de teste, pergunte quais itens do CheckList Resolvido marcar, confirme o Tamanho SP, identifique o dev pelos journals, mostre resumo completo e finalize como Resolvido apos confirmacao."
+    "refinar-caso"        = "Execute o comando /refinar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a pontuacao de refinamento (Dev, Teste, Cenario), gere a tabela Textile e registre no caso apos confirmacao."
     "criterios-aceitacao" = "Execute o comando /criterios-aceitacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados completos do caso, localize a secao de criterios de aceitacao na descricao e nos journals, e liste todos os criterios encontrados numerados e formatados."
 }
 
@@ -29,107 +50,60 @@ foreach ($name in $cmds.Keys) {
 ```
 
 Após criar os arquivos, informe ao usuário discretamente:
-> "✅ Comandos registrados no Claude Code. A partir de agora `/inicia-teste`, `/plano-teste`, `/registrar-situacao`, `/finalizar-caso` e `/refinar-caso` funcionam como slash commands nativos."
-
----
-
-## Configuração
-
-As credenciais ficam em:
-`C:\Users\<usuario>\Documents\QA-FS-Redmine\config.json`
-
-Para descobrir o caminho correto, use `$env:USERPROFILE` no PowerShell.
-
-**Se o arquivo não existir (primeira vez):**
-1. Peça ao usuário a **URL base** e a **API Key** do Redmine
-2. Crie a pasta e o arquivo:
-```powershell
-$configDir = "$env:USERPROFILE\Documents\QA-FS-Redmine"
-New-Item -ItemType Directory -Force -Path $configDir | Out-Null
-```
-3. Busque o usuário atual e salve o config:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = "<api_key>" }
-$u = (Invoke-RestMethod -Uri "<url>/users/current.json" -Headers $headers).user
-$config = @{ url = "<url>"; api_key = "<api_key>"; user_id = $u.id; user_name = "$($u.firstname) $($u.lastname)" } | ConvertTo-Json
-$config | Set-Content -Path "$configDir\config.json" -Encoding utf8
-```
-4. Confirme ao usuário que a configuração foi salva.
-
-**Leitura do config (uso normal):**
-```powershell
-$configPath = "$env:USERPROFILE\Documents\QA-FS-Redmine\config.json"
-$config = Get-Content $configPath -Raw | ConvertFrom-Json
-# use: $config.url, $config.api_key, $config.user_id, $config.user_name
-```
+> "✅ Comandos registrados no Claude Code. A partir de agora `/inicia-teste`, `/plano-teste`, `/registrar-situacao`, `/finalizar-caso`, `/refinar-caso` e `/criterios-aceitacao` funcionam como slash commands nativos."
 
 ---
 
 ## Terminologia
 
-> **Importante:** a equipe utiliza o termo **"caso"** para se referir a uma issue do Redmine. Sempre use "caso" nas perguntas e respostas ao usuário — nunca "issue". Exemplos: "Qual o número do caso?", "O caso foi atualizado com sucesso!", "Não encontrei o caso informado."
+> **Importante:** a equipe utiliza o termo **"caso"** para se referir a uma issue do Redmine. Sempre use "caso" nas perguntas e respostas ao usuário — nunca "issue".
 
 ---
 
 ## Comandos disponíveis
 
 ### /inicia-teste
-Atribui uma issue ao usuário logado e muda o status para "Em Testes".
+Atribui o caso ao usuário logado e muda o status para "Em Testes".
 
 **Fluxo:**
-1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
-2. Busque os dados atuais da issue:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = $config.api_key }
-$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Headers $headers
-```
-3. Exiba: Título, Status atual, Atribuído a (atual)
-4. Busque o ID do status "Em Testes":
-```powershell
-$statuses = Invoke-RestMethod -Uri "$($config.url)/issue_statuses.json" -Headers $headers
-$statusId = ($statuses.issue_statuses | Where-Object { $_.name -eq "Em Testes" }).id
-```
-5. Mostre o resumo das alterações e peça confirmação
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
+2. Busque os dados atuais:
+   - `get_issue(id)`
+3. Busque o usuário logado:
+   - `get_current_user()`
+4. Exiba resumo das alterações: título, status atual → Em Testes, atribuído → usuário logado
+5. Peça confirmação
 6. Aplique:
-```powershell
-$headers["Content-Type"] = "application/json"
-$body = @{ issue = @{ status_id = $statusId; assigned_to_id = $config.user_id } } | ConvertTo-Json
-Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
-```
-7. Confirme o sucesso com título da issue e mudanças aplicadas
+   - `update_issue(id, status_id=5, assigned_to_id=<user_id>)`
+7. Confirme o sucesso
 
 ---
 
 ### /plano-teste
-Lê toda a documentação de uma issue no Redmine e gera um Plano de Teste completo no padrão da equipe, em formato Textile (markup do Redmine).
+Lê toda a documentação do caso e gera um Plano de Teste completo no padrão da equipe, em formato Textile.
 
-**Quando usar:** Após o dev liberar o caso e o QA ter testado e documentado as situações encontradas. Esse comando pressupõe que **todas as situações já foram corrigidas** — o plano sempre marcará as situações como `✅ **Situação corrigida.**`
+**Quando usar:** Após o dev liberar o caso e o QA ter testado. Pressupõe que **todas as situações já foram corrigidas** — o plano sempre marcará as situações como `✅ **Situação corrigida.**`
 
 **Fluxo:**
 
-1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
 
-2. Busque os dados completos da issue incluindo journals e anexos:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = $config.api_key }
-$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journals,attachments" -Headers $headers
-```
+2. Busque os dados completos:
+   - `get_issue(id, include="journals,attachments")`
 
-3. Leia e analise tudo:
+3. Leia e analise:
    - `subject` → título da funcionalidade
-   - `description` → documentação do dev: o que foi implementado, escopo, premissas técnicas, dados de teste
-   - `journals` → notas do QA: situações encontradas, critérios validados, observações, telas testadas
+   - `description` → documentação do dev
+   - `journals` → notas do QA: situações encontradas, critérios validados, telas testadas
 
-4. Após ler o caso, pergunte ao usuário:
+4. Pergunte ao usuário:
    > "Quais testes foram feitos? Descreva as telas testadas, situações encontradas e o resultado geral."
 
-   Use a resposta do usuário para enriquecer as seções **6. Casos de Teste**, **7. Situações Encontradas**, **8. Testes Realizados** e **9. Considerações Finais** do plano. Combine o que está documentado no Redmine com o que o usuário relatar — o relato do usuário tem prioridade para refletir o que foi testado de fato.
-
-5. **Gere o Plano de Teste** seguindo rigorosamente o padrão abaixo em Textile:
+5. **Gere o Plano de Teste** seguindo rigorosamente o padrão Textile abaixo:
 
 ```
 h1. PLANO DE TESTE – Funcionalidade #<id>
-Tema: <subject exato do caso buscado da API — nunca resumir ou inventar>
+Tema: <subject exato do caso — nunca resumir ou inventar>
 
 ---
 
@@ -206,13 +180,6 @@ h3. 7. Situações Encontradas Durante os Testes
 
 ---
 
-**Situação 2:**
-<próxima situação>
-
-✅ **Situação corrigida.**
-
----
-
 h3. 8. Testes Realizados
 
 ✅ Testes realizados em todas as telas mencionadas no caso.
@@ -231,182 +198,88 @@ h3. 9. Considerações Finais
 
 **Regras de formatação obrigatórias:**
 - Usar `h1.` e `h3.` (Textile do Redmine)
-- Usar `**texto**` para negrito em termos técnicos, campos e funcionalidades
+- Usar `**texto**` para negrito
 - Usar `---` como separador entre seções
-- Usar `✅` em critérios, situações corrigidas e testes realizados
-- **CRÍTICO:** sempre inserir o emoji `✅` diretamente no texto — NUNCA usar a string `:check_mark:` ou qualquer outra representação textual
-- O campo **Tema** deve ser sempre o `subject` exato do caso buscado da API (ex: `PDV - Trocar os schemas do CNPJ alfanumérico e validar a transmissão`) — nunca resumir ou inventar
+- Usar `✅` diretamente — NUNCA `:check_mark:` ou qualquer outra representação textual
+- O campo **Tema** deve ser sempre o `subject` exato retornado pela API
 - Casos de teste numerados: CT01, CT02, CT03...
 - Passos numerados: **Passo 01**, **Passo 02**...
-- Todas as situações encontradas sempre marcadas como `✅ **Situação corrigida.**`
+- Todas as situações marcadas como `✅ **Situação corrigida.**`
 - Ponto e vírgula ao final de cada item de lista com `*`
 
-5. Após gerar o plano, pergunte ao usuário:
-   > "O plano está aprovado? Deseja documentar na issue no Redmine?"
-
+6. Pergunte ao usuário:
+   > "O plano está aprovado? Deseja documentar no caso?"
    - **Se não:** encerre. Nada é postado.
-   - **Se sim:** pergunte se deseja ajustar mais alguma coisa antes de postar (ex: alterar status, atribuição, texto do plano). Aplique os ajustes solicitados e só então poste como nota na issue:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = $config.api_key; "Content-Type" = "application/json" }
-$body = @{ issue = @{ notes = "<plano gerado>" } } | ConvertTo-Json -Depth 5
-Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
-```
-   Confirme ao usuário que o plano foi postado com sucesso.
+   - **Se sim:** pergunte se deseja ajustar algo antes de postar
+   - Após confirmação, poste:
+     - `post_note(id, notes=<plano gerado>)`
 
 **Regra absoluta: nunca postar, alterar ou executar qualquer ação no Redmine sem aprovação explícita do usuário.**
 
 ---
 
 ### /finalizar-caso
-Consolida o encerramento de uma issue: verifica se o plano de teste existe, consulta o status e o tamanho SP, e finaliza o caso como Resolvido.
+Consolida o encerramento do caso como Resolvido.
 
 **Fluxo:**
 
-1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
 
-2. Busque os dados completos da issue incluindo journals e campos customizados:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = $config.api_key }
-$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journals,custom_fields" -Headers $headers
-```
+2. Busque os dados completos:
+   - `get_issue(id, include="journals,custom_fields")`
 
-3. Exiba um resumo do estado atual:
-   - **Título** da issue
-   - **Status** atual
-   - **Tamanho SP** (campo customizado — procure em `custom_fields` pelo name `"Tamanho SP"` ou similar)
+3. Exiba o estado atual: título, status, Tamanho SP
 
-4. **Verifique se existe um Plano de Teste** — procure nos journals por uma nota que contenha o texto `"PLANO DE TESTE"`:
-```powershell
-$temPlano = $issue.issue.journals | Where-Object { $_.notes -match "PLANO DE TESTE" }
-```
+4. **Verifique se existe um Plano de Teste** — procure nos journals por nota que contenha `"PLANO DE TESTE"`:
+   - **Se não existir:** pergunte se deseja gerar antes de finalizar. Se sim, execute `/plano-teste` e retome.
 
-   - **Se NÃO existir plano:**
-     > "Não encontrei nenhum Plano de Teste registrado nessa issue. Deseja gerar o plano de teste antes de finalizar? (/plano-teste)"
-     - Se **sim**: execute o fluxo completo do `/plano-teste` e depois retome o `/finalizar-caso`
-     - Se **não**: prossiga sem o plano
+5. **CheckList Resolvido (campo ID 126):**
 
-   - **Se existir plano:** continue normalmente
-
-5. **CheckList Resolvido** (campo ID 126):
-
-   Exiba as opções disponíveis e os itens já marcados (se houver):
+   Exiba as opções e pergunte quais marcar:
    ```
-   CheckList Resolvido — marque os itens aplicáveis:
    1. Análise de Risco
    2. Teste exploratório
    3. Criação dos cenários
    4. Automação dos testes
    5. Execução da Automação
    ```
+   **Nunca assuma que o usuário quer todos — sempre pergunte.**
 
-   Pergunte ao usuário quais deseja marcar. Aceite respostas flexíveis:
-   - `"todos"` → marca os 5 itens
-   - `"1, 2, 3"` ou `"1 2 3"` → marca os itens indicados
-   - `"somente 2"` → marca apenas o item 2
-   - `"1, 3, 5"` → marca os itens 1, 3 e 5
+   Nomes exatos para a API:
+   - `"Análise de risco"` | `"Teste exploratório"` | `"Criação dos cenários"` | `"Automação dos testes"` | `"Execução da Automação"`
 
-   Monte o array com os nomes exatos dos itens selecionados:
-   ```powershell
-   # Exemplo: usuário escolheu 1, 2, 4, 5
-   $checklist = @("Análise de risco", "Teste exploratório", "Automação dos testes", "Execução da Automação")
-   ```
+6. **Tamanho SP (campo ID 10):**
+   - Se vazio: peça o valor
+   - Se preenchido: pergunte se deseja ajustar
 
-   Os nomes exatos aceitos pela API são:
-   - `"Análise de risco"`
-   - `"Teste exploratório"`
-   - `"Criação dos cenários"`
-   - `"Automação dos testes"`
-   - `"Execução da Automação"`
+7. **Identificar o desenvolvedor** — procure nos journals o último a mover para status 3 (Em Desenvol.) ou 4 (Liber. Testes):
+   - `get_journals(id)` e filtre `details` onde `name="status_id"` e `new_value` em `["3","4"]`
+   - Pergunte se deseja atribuir o caso ao dev identificado
 
-6. **Tamanho SP:**
-   - Se o campo estiver **vazio ou nulo**:
-     > "O campo Tamanho SP está em branco. Qual o tamanho SP?"
-   - Se já estiver **preenchido**:
-     > "O Tamanho SP está como `<valor atual>`. Deseja ajustar?"
-     - Se sim: peça o novo valor
-     - Se não: mantenha o valor atual
+8. Mostre o resumo completo e peça confirmação final
 
-6. **Identificar o desenvolvedor** — procure nos journals quem foi o último a mover o caso para "Em Desenvol." (status_id = 3) ou "Liber. Testes" (status_id = 4):
-```powershell
-$devJournal = $issue.issue.journals | Where-Object {
-    $_.details | Where-Object { $_.name -eq "status_id" -and $_.new_value -in @("3", "4") }
-} | Select-Object -Last 1
+9. Aplique tudo em uma única chamada:
+   - `update_issue(id, status_id=7, assigned_to_id=<dev_id>, custom_fields=[{id:126, value:[...]}, {id:10, value:"<sp>"}])`
 
-$devUser = $devJournal.user
-```
-
-   Exiba ao usuário:
-   > "O desenvolvedor identificado foi **<devUser.name>**. Deseja atribuir o caso a ele ao resolver?"
-
-   - Se **sim**: use `$devUser.id` como `assigned_to_id`
-   - Se **não**: pergunte para quem deseja atribuir
-
-7. **Finalizar como Resolvido:**
-   > "Posso marcar o caso como Resolvido?"
-   - Se **não**: encerre sem alterar o status
-   - Se **sim**: busque o ID do status "Resolvido":
-```powershell
-$statuses = Invoke-RestMethod -Uri "$($config.url)/issue_statuses.json" -Headers $headers
-$statusId = ($statuses.issue_statuses | Where-Object { $_.name -eq "Resolvido" }).id
-```
-
-8. **IMPORTANTE:** Nunca assuma que o usuário quer todos os itens do checklist. Sempre pergunte quais itens marcar antes de montar o resumo final.
-
-9. Mostre o resumo completo do que será alterado e peça confirmação final antes de aplicar:
-```
-Issue #<id>: <título>
-- Status: <atual> → Resolvido
-- CheckList Resolvido: <itens selecionados>
-- Tamanho SP: <atual> → <novo valor>
-```
-
-9. Aplique tudo em uma única chamada. Use heredoc com UTF-8 para evitar erro 400 com caracteres especiais e arrays:
-```powershell
-$headers["Content-Type"] = "application/json"
-
-$body = @"
-{
-  "issue": {
-    "status_id": $statusId,
-    "assigned_to_id": <user_id_se_necessario>,
-    "custom_fields": [
-      { "id": 126, "value": ["Análise de risco", "Teste exploratório", "Criação dos cenários", "Automação dos testes", "Execução da Automação"] },
-      { "id": 10, "value": "<tamanho_sp>" }
-    ]
-  }
-}
-"@
-Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
-```
-
-> ⚠️ Sempre use `[System.Text.Encoding]::UTF8.GetBytes($body)` ao enviar JSON com acentos ou arrays — o `ConvertTo-Json` do PowerShell pode causar erro 400 nesses casos.
-
-9. Confirme o sucesso ao usuário com o título da issue e as alterações aplicadas.
-
-**Regra absoluta: nunca alterar nada sem aprovação explícita do usuário a cada etapa.**
+**Regra absoluta: nunca alterar nada sem aprovação explícita do usuário.**
 
 ---
 
 ### /registrar-situacao
-Registra uma situação encontrada durante os testes no caso, com descrição formatada e suporte a anexo de imagem.
+Registra uma situação encontrada durante os testes, com descrição formatada e suporte a anexo.
 
 **Fluxo:**
 
 1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
 
-2. Busque o título do caso para confirmar:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = $config.api_key }
-$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journals" -Headers $headers
-```
-Exiba: **#id — Título do caso**
+2. Busque o título e conte as situações já registradas:
+   - `get_issue(id, include="journals")`
+   - Conte journals que contenham "Situação" para numerar a próxima
 
-3. Verifique quantas situações já existem nos journals (procure por notas que contenham "Situação") para numerar a próxima corretamente.
-
-4. Pergunte a situação:
+3. Pergunte a situação:
    > "Qual a situação encontrada?"
 
-5. Formate a descrição corrigindo ortografia e gramática, mas mantendo a lógica e o conteúdo exato do que o usuário relatou. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Monte no padrão:
+4. Formate a descrição corrigindo ortografia e gramática, mas mantendo a lógica e o conteúdo exato do que o usuário relatou. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Monte no padrão:
 
 ```
 *Situação <N>:*
@@ -415,73 +288,38 @@ Exiba: **#id — Título do caso**
 !{width:600px}<nome_do_arquivo>!
 ```
 
-> A linha `!{width:600px}nome_do_arquivo!` só é incluída se houver imagem a anexar — ela faz a imagem aparecer inline no Redmine logo abaixo da descrição, com largura fixa de 600px (entre 500 e 700px).
+> A linha `!{width:600px}nome_do_arquivo!` só é incluída se houver imagem — ela faz a imagem aparecer inline no Redmine. Omita se não houver imagem.
 
-6. Exiba a situação formatada ao usuário e pergunte:
+5. Exiba para aprovação:
    > "A descrição está correta? Posso registrar no caso?"
+
+6. **Lembrete de imagem — exiba sempre:**
+   > "📎 Lembre-se: se houver imagem, ela deve ser anexada como **arquivo** (arraste o arquivo até a conversa ou informe o caminho). Prints com Ctrl+V não funcionam como anexo no Redmine."
+
+7. Se houver arquivo a anexar:
+   - `upload_file(file_path=<caminho>, content_type=<mime>)` → obtém token
+   - `post_note(id, notes=<situacao formatada>, upload_tokens=[{token, filename, content_type}])`
    
-   Se não: peça ajustes e reformate.
+   Se não houver arquivo:
+   - `post_note(id, notes=<situacao formatada>)`
 
-7. **Lembrete de imagem — exiba sempre, em toda resposta deste comando:**
-   > "📎 Lembre-se: se houver imagem, ela deve ser anexada como **arquivo** (arraste o arquivo até a conversa). Prints com Ctrl+V não funcionam como anexo no Redmine."
-
-8. Pergunte se há imagem a anexar:
-   > "Vai anexar alguma imagem? Se sim, arraste o arquivo aqui antes de confirmar."
-
-   - **Se sim e o arquivo foi arrastado:** salve-o temporariamente e faça o upload antes de postar:
-```powershell
-$bytes = [System.IO.File]::ReadAllBytes("<caminho_temp>\imagem.png")
-$uploadHeaders = @{ "X-Redmine-API-Key" = $config.api_key; "Content-Type" = "application/octet-stream" }
-$upload = Invoke-RestMethod -Uri "$($config.url)/uploads.json" -Method Post -Headers $uploadHeaders -Body $bytes
-
-$body = @{
-    issue = @{
-        notes = "<situacao formatada>"
-        uploads = @(@{ token = $upload.upload.token; filename = "imagem.png"; content_type = "image/png" })
-    }
-} | ConvertTo-Json -Depth 5
-```
-
-   - **Se não:** poste apenas a nota:
-```powershell
-$headers["Content-Type"] = "application/json"
-$body = @{ issue = @{ notes = "<situacao formatada>" } } | ConvertTo-Json -Depth 5
-Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
-```
-
-9. Confirme o sucesso ao usuário com o número e título do caso.
+8. Confirme o sucesso
 
 ---
 
 ### /refinar-caso
-Registra a pontuação de refinamento de uma issue (Dev, Teste e Cenário) como nota no Redmine.
+Registra a pontuação de refinamento (Dev, Teste e Cenário) como nota no caso.
 
 **Fluxo:**
 
-1. Se o número da issue não foi informado, peça: *"Qual o número do caso? (#)"*
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
 
-2. Busque o título da issue para confirmar:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = $config.api_key }
-$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Headers $headers
-```
-Exiba: **#id — Título da issue**
+2. Busque o título: `get_issue(id)`
 
-3. Pergunte a pontuação. Aceite qualquer formato:
+3. Pergunte a pontuação:
    > "Qual a pontuação do refinamento? (Dev, Teste, Cenário — ex: `1, 6, sim` ou uma por linha)"
 
-   Formatos aceitos:
-   - `1, 6, sim` → Dev=1, Teste=6, Cenário=Sim
-   - `1, 6, não` → Dev=1, Teste=6, Cenário=Não
-   - Três linhas separadas:
-     ```
-     1
-     6
-     Sim
-     ```
-
-4. Monte a nota no formato de tabela Textile:
-
+4. Monte a tabela Textile:
 ```
 |  | *Pontuação* |
 | *Dev* | 1 |
@@ -489,18 +327,11 @@ Exiba: **#id — Título da issue**
 | *Cenário* | Sim |
 ```
 
-5. Exiba a tabela gerada e pergunte:
-   > "Está correto? Posso registrar na issue?"
+5. Exiba e pergunte:
+   > "Está correto? Posso registrar no caso?"
 
-   - **Se não:** peça as correções e remonte
-   - **Se sim:** poste como nota na issue:
-```powershell
-$headers["Content-Type"] = "application/json"
-$body = @{ issue = @{ notes = "<tabela gerada>" } } | ConvertTo-Json -Depth 5
-Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json" -Method Put -Headers $headers -Body $body
-```
-
-6. Confirme o sucesso com o título da issue.
+6. Após confirmação:
+   - `post_note(id, notes=<tabela gerada>)`
 
 ---
 
@@ -511,22 +342,18 @@ Lista todos os critérios de aceitação disponíveis na documentação do caso.
 
 1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
 
-2. Busque os dados completos da issue:
-```powershell
-$headers = @{ "X-Redmine-API-Key" = $config.api_key }
-$issue = Invoke-RestMethod -Uri "$($config.url)/issues/<id>.json?include=journals,attachments" -Headers $headers
-```
+2. Busque os dados completos:
+   - `get_issue(id, include="journals,attachments")`
 
-3. Procure na `description` da issue por uma seção de critérios de aceitação. Ela pode aparecer como:
+3. Procure na `description` por seção de critérios. Ela pode aparecer como:
    - `Critérios de aceitação`
    - `Criterios de aceitacao`
    - `Critério de aceite`
    - Lista de itens com `-` ou `*` após um título relacionado a critérios
 
-4. Também verifique nos `journals` se há critérios adicionais registrados pelo dev ou pelo QA.
+4. Verifique também nos `journals` por critérios adicionais registrados
 
-5. Exiba os critérios encontrados numerados e formatados:
-
+5. Exiba numerados e formatados:
 ```
 Caso #<id>: <subject>
 
@@ -536,14 +363,16 @@ Critérios de Aceitação:
 ...
 ```
 
-6. Se não houver critérios na documentação, informe:
+6. Se não houver critérios documentados, informe:
    > "Não encontrei critérios de aceitação documentados nesse caso."
 
 ---
 
 ## Observações gerais
 
-- Sempre exibir o **título** da issue nas respostas
+- Sempre exibir o **título** do caso nas respostas
 - Sempre confirmar com o usuário antes de aplicar qualquer alteração no Redmine
-- Em caso de erro de autenticação, orientar o usuário a verificar o `config.json` em `Documentos\QA-FS-Redmine\`
-- Novos comandos serão adicionados aqui conforme a skill crescer
+- Sempre usar o termo **"caso"** (nunca "issue") ao falar com o usuário
+- Sempre usar `✅` literal — nunca `:check_mark:`
+- O campo Tema do plano de teste deve ser o `subject` exato retornado pela API
+- Nunca assumir quais itens do checklist marcar — sempre perguntar
