@@ -17,6 +17,7 @@ copy /Y "commands\registrar-situacao.md"  "%DEST%\" >nul
 copy /Y "commands\finalizar-caso.md"      "%DEST%\" >nul
 copy /Y "commands\refinar-caso.md"        "%DEST%\" >nul
 copy /Y "commands\criterios-aceitacao.md" "%DEST%\" >nul
+copy /Y "commands\info-caso.md"          "%DEST%\" >nul
 
 echo  Comandos instalados em: %DEST%
 echo.
@@ -26,6 +27,7 @@ echo  /registrar-situacao
 echo  /finalizar-caso
 echo  /refinar-caso
 echo  /criterios-aceitacao
+echo  /info-caso
 echo.
 echo  Pronto! Reinicie o Claude Code para usar os comandos.
 echo.

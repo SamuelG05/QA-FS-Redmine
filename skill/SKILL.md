@@ -54,6 +54,7 @@ $cmds = @{
     "finalizar-caso"      = "Execute o comando /finalizar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados do caso, verifique plano de teste, pergunte quais itens do CheckList Resolvido marcar, confirme o Tamanho SP, identifique o dev pelos journals, mostre resumo completo e finalize como Resolvido apos confirmacao."
     "refinar-caso"        = "Execute o comando /refinar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a pontuacao de refinamento (Dev, Teste, Cenario), gere a tabela Textile e registre no caso apos confirmacao."
     "criterios-aceitacao" = "Execute o comando /criterios-aceitacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados completos do caso, localize a secao de criterios de aceitacao na descricao e nos journals, e liste todos os criterios encontrados numerados e formatados."
+    "info-caso"           = "Execute o comando /info-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque todos os dados do caso (titulo, descricao completa, status, atribuicao, campos customizados, anexos e todos os journals com notas e alteracoes) e exiba de forma organizada e legivel."
 }
 
 foreach ($name in $cmds.Keys) {
@@ -347,6 +348,52 @@ Registra a pontuação de refinamento (Dev, Teste e Cenário) como nota no caso.
 
 6. Após confirmação:
    - `post_note(id, notes=<tabela gerada>)`
+
+---
+
+### /info-caso
+Exibe todas as informações do caso de forma organizada: título, descrição completa, status, campos customizados, anexos e histórico completo de journals com notas e alterações.
+
+**Fluxo:**
+
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
+
+2. Busque todos os dados:
+   - PowerShell: `GET /issues/<id>.json?include=journals,attachments,custom_fields`
+
+3. Exiba no formato abaixo:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 Caso #<id> — <subject>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Status: <status>
+Atribuído a: <nome ou "(ninguém)">
+Autor: <nome>
+Criado em: <data>
+Atualizado em: <data>
+
+─── Campos Customizados ───
+Tamanho SP: <valor>
+<outros campos com valor preenchido>
+
+─── Descrição ───
+<descrição completa>
+
+─── Anexos (<N>) ───
+- <filename> — <autor> em <data>
+...
+
+─── Histórico (<N> entradas) ───
+[<data>] <usuário>
+  Alterações: <campo> → "<valor antigo>" para "<valor novo>"
+  Nota: <texto da nota se houver>
+...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+4. Exiba tudo — não resuma nem omita journals ou alterações.
 
 ---
 

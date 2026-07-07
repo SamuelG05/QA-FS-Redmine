@@ -16,6 +16,7 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, 
 | `/finalizar-caso` | Identifica o dev, verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
 | `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela no caso |
 | `/criterios-aceitacao` | Lista todos os critérios de aceitação documentados no caso |
+| `/info-caso` | Exibe todas as informações do caso: descrição, histórico completo, anexos e alterações |
 
 ---
 
@@ -314,5 +315,5 @@ cp commands/*.md ~/.claude/commands/
 
 <div align="center">
   <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 07/07/2026 às 10:15</sub>
+  <sub>Última atualização: 07/07/2026 às 16:10</sub>
 </div>
