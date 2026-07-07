@@ -241,6 +241,45 @@ Claude:
 
 ---
 
+## 📋 Fluxo — `/info-caso`
+
+```
+Usuário: /info-caso #17776
+
+Claude:
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📋 Caso #17776 — NF-e - Criar Evento Informação de efetivo pagamento...
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Status: Em Testes
+  Atribuído a: Samuel Gonçalves
+  Autor: José Inácio Carvalho
+  Criado em: 09/02/2026
+  Atualizado em: 07/07/2026
+
+  ─── Campos Customizados ───
+  Tamanho SP: 21
+  Time: The Wall
+  Cliente: todos
+
+  ─── Descrição ───
+  <descrição completa do caso>
+
+  ─── Anexos (3) ───
+  - situacao1.png — Samuel Gonçalves em 07/07/2026
+  - ajustes-performance-modais.md — Samuel Gonçalves em 07/07/2026
+  - index.html — Samuel Gonçalves em 07/07/2026
+
+  ─── Histórico (8 entradas) ───
+  [07/07/2026] Samuel Gonçalves
+    Alterações: status → "Liber. Testes" para "Em Testes"
+    Nota: *Situação 1:* Ao tentar abrir o Retaguarda...
+  ...
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
 ## 🔒 Segurança
 
 - Nenhuma credencial é armazenada na skill ou no repositório
