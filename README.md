@@ -303,7 +303,8 @@ QA-FS-Redmine/
     ├── registrar-situacao.md
     ├── finalizar-caso.md
     ├── refinar-caso.md
-    └── criterios-aceitacao.md
+    ├── criterios-aceitacao.md
+    └── info-caso.md
 ```
 
 ---
