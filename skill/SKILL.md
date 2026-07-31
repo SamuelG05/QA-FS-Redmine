@@ -282,20 +282,31 @@ Consolida o encerramento do caso como Resolvido.
 ---
 
 ### /registrar-situacao
-Registra uma situação encontrada durante os testes, com descrição formatada e suporte a anexo.
+Registra uma situação encontrada durante os testes, com descrição formatada e suporte a anexo. Cria automaticamente uma pasta local para o caso.
 
 **Fluxo:**
 
 1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
 
-2. Busque o título e conte as situações já registradas:
+2. **Caminho base das pastas de casos — pergunte uma vez por sessão:**
+   - Na primeira execução de `/registrar-situacao` na sessão, pergunte:
+     > "Qual o caminho base para as pastas de casos? (padrão: `C:\Users\PC\OneDrive\CASOS`)"
+   - Se o usuário confirmar ou não responder, use `C:\Users\PC\OneDrive\CASOS`
+   - Salve o caminho em memória de sessão para não perguntar novamente
+   - Crie a pasta do caso via PowerShell se ainda não existir:
+     ```powershell
+     $casePath = "<caminho_base>\<numero_do_caso>"
+     New-Item -ItemType Directory -Force -Path $casePath | Out-Null
+     ```
+
+3. Busque o título e conte as situações já registradas:
    - `get_issue(id, include="journals")`
    - Conte journals que contenham "Situação" para numerar a próxima
 
-3. Pergunte a situação:
+4. Pergunte a situação:
    > "Qual a situação encontrada?"
 
-4. Formate a descrição corrigindo ortografia e gramática, mas mantendo a lógica e o conteúdo exato do que o usuário relatou. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Monte no padrão:
+5. Formate a descrição corrigindo ortografia e gramática, mas mantendo a lógica e o conteúdo exato do que o usuário relatou. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Monte no padrão:
 
 ```
 *Situação <N>:*
@@ -306,20 +317,21 @@ Registra uma situação encontrada durante os testes, com descrição formatada 
 
 > A linha `!{width:600px}nome_do_arquivo!` só é incluída se houver imagem — ela faz a imagem aparecer inline no Redmine. Omita se não houver imagem.
 
-5. Exiba para aprovação:
+6. Exiba para aprovação:
    > "A descrição está correta? Posso registrar no caso?"
 
-6. **Lembrete de imagem — exiba sempre:**
+7. **Lembrete de imagem — exiba sempre:**
    > "📎 Lembre-se: se houver imagem, ela deve ser anexada como **arquivo** (arraste o arquivo até a conversa ou informe o caminho). Prints com Ctrl+V não funcionam como anexo no Redmine."
+   > "📁 Pasta do caso criada em: `<caminho_base>\<numero_do_caso>`"
 
-7. Se houver arquivo a anexar:
+8. Se houver arquivo a anexar:
    - `upload_file(file_path=<caminho>, content_type=<mime>)` → obtém token
    - `post_note(id, notes=<situacao formatada>, upload_tokens=[{token, filename, content_type}])`
    
    Se não houver arquivo:
    - `post_note(id, notes=<situacao formatada>)`
 
-8. Confirme o sucesso
+9. Confirme o sucesso
 
 ---
 
