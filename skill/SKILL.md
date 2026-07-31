@@ -543,21 +543,38 @@ CT02 – <próximo caso>
    - Cobrir todos os critérios de aceitação do caso
 
 7. **Exibir tudo para o usuário** e perguntar:
-   > "Os cenários e casos de teste estão corretos? Deseja que eu registre no caso do Redmine?"
+   > "Os cenários e casos de teste estão corretos? Posso registrar no Redmine e mover o card no Trello?"
 
-8. **Se o usuário confirmar:**
-   - Monte o conteúdo em bloco de código dentro de nota Redmine:
+8. **Se o usuário confirmar — executar as duas ações:**
+
+   **8a. Postar no Redmine** (independente do status atual do caso):
+   - Monte o conteúdo e poste via `post_note`:
    ```
    <pre><code class="gherkin">
-   <cenários gerados>
+   <cenários Gherkin gerados>
    </code></pre>
 
-   <cenários CT gerados em texto simples>
+   <casos de teste CT em texto simples>
    ```
    - `post_note(id, notes=<conteudo>)`
-   - Confirme o sucesso
 
-**Regra absoluta: nunca postar no Redmine sem aprovação explícita do usuário.**
+   **8b. Mover o card no Trello para a coluna "Cenários BDD" no topo:**
+   - Primeiro, busque o ID da lista "Cenários BDD" no board:
+   ```powershell
+   $lists = Invoke-RestMethod -Uri "https://api.trello.com/1/boards/$boardId/lists?key=$apiKey&token=$token&fields=name,id" -Method Get
+   $listBDD = $lists | Where-Object { $_.name -match "Cen.rios BDD" } | Select-Object -First 1
+   $listId = $listBDD.id
+   ```
+   - Mova o card para essa lista e posicione no topo:
+   ```powershell
+   $body = @{ idList = $listId; pos = "top" }
+   Invoke-RestMethod -Uri "https://api.trello.com/1/cards/$($card.id)?key=$apiKey&token=$token" -Method Put -Body $body
+   ```
+
+9. Confirme o sucesso:
+   > "✅ Cenários registrados no caso #<id> do Redmine e card movido para o topo de Cenários BDD no Trello!"
+
+**Regra absoluta: nunca postar no Redmine ou mover o card sem aprovação explícita do usuário.**
 
 ---
 
