@@ -550,7 +550,7 @@ CT02 – <próximo caso>
    **8a. Postar no Redmine** (independente do status atual do caso):
    - Monte o conteúdo e poste via `post_note`:
    ```
-   <pre><code class="gherkin">
+   <pre><code>
    <cenários Gherkin gerados>
    </code></pre>
 
