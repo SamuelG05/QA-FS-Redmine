@@ -55,6 +55,7 @@ $cmds = @{
     "refinar-caso"        = "Execute o comando /refinar-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque o titulo do caso, pergunte a pontuacao de refinamento (Dev, Teste, Cenario), gere a tabela Textile e registre no caso apos confirmacao."
     "criterios-aceitacao" = "Execute o comando /criterios-aceitacao da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque os dados completos do caso, localize a secao de criterios de aceitacao na descricao e nos journals, e liste todos os criterios encontrados numerados e formatados."
     "info-caso"           = "Execute o comando /info-caso da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: busque todos os dados do caso (titulo, descricao completa, status, atribuicao, campos customizados, anexos e todos os journals com notas e alteracoes) e exiba de forma organizada e legivel."
+    "up-refinados"        = "Execute o comando /up-refinados da skill QA-FS-Redmine para o caso: `$ARGUMENTS`\n\nSiga o fluxo definido na skill: acesse o card no quadro Upstream The Wall do Trello, busque o caso completo no Redmine (descricao + journals + criterios de aceitacao), identifique o caso dependente (@DEPENDE), gere os cenarios Gherkin com @Automatizar e @DEPENDE e os casos de teste no padrao CT, exiba tudo para aprovacao e registre no caso apos confirmacao."
 }
 
 foreach ($name in $cmds.Keys) {
@@ -440,6 +441,123 @@ Critérios de Aceitação:
 
 6. Se não houver critérios documentados, informe:
    > "Não encontrei critérios de aceitação documentados nesse caso."
+
+---
+
+### /up-refinados
+Acessa o card do caso no quadro "Upstream The Wall" do Trello, lê o caso completo no Redmine e gera cenários Gherkin com tags `@Automatizar` e `@DEPENDE: #<caso_pai>` + casos de teste no padrão CT.
+
+**Credenciais Trello** — leia de `$env:USERPROFILE\Documents\QA-FS-Redmine\config.json` (campos `trello_api_key`, `trello_token`, `trello_upstream_board_id`).
+
+Se qualquer um desses campos não existir no config.json, pergunte ao usuário:
+> "Para usar o /up-refinados preciso das suas credenciais do Trello:
+> - Trello API Key:
+> - Trello Token:
+> - Board ID do Upstream The Wall:"
+
+Após receber os valores, adicione-os ao config.json existente via PowerShell:
+```powershell
+$configPath = "$env:USERPROFILE\Documents\QA-FS-Redmine\config.json"
+$config = Get-Content $configPath -Raw | ConvertFrom-Json
+$config | Add-Member -NotePropertyName "trello_api_key" -NotePropertyValue "<valor>" -Force
+$config | Add-Member -NotePropertyName "trello_token" -NotePropertyValue "<valor>" -Force
+$config | Add-Member -NotePropertyName "trello_upstream_board_id" -NotePropertyValue "<valor>" -Force
+$config | ConvertTo-Json | Set-Content -Path $configPath -Encoding utf8
+```
+Salve em memória de sessão para não perguntar novamente.
+
+**Fluxo:**
+
+1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
+
+2. **Buscar o card no Trello** via PowerShell:
+```powershell
+$config = Get-Content "$env:USERPROFILE\Documents\QA-FS-Redmine\config.json" -Raw | ConvertFrom-Json
+$apiKey = $config.trello_api_key
+$token = $config.trello_token
+$boardId = $config.trello_upstream_board_id
+$cards = Invoke-RestMethod -Uri "https://api.trello.com/1/boards/$boardId/cards?key=$apiKey&token=$token&fields=name,desc,idList" -Method Get
+$card = $cards | Where-Object { $_.name -match "<numero_do_caso>" } | Select-Object -First 1
+Write-Output $card.name
+Write-Output $card.desc
+```
+   - Se o card não for encontrado, informe ao usuário e encerre.
+
+3. **Buscar o caso completo no Redmine** (descrição + journals):
+   - `get_issue(id, include="journals,attachments,custom_fields")`
+   - Ou via PowerShell: `GET /issues/<id>.json?include=journals,attachments,custom_fields`
+
+4. **Identificar o caso dependente (`@DEPENDE`):**
+   - Procure na descrição do card Trello ou na descrição do caso Redmine por referências a outros casos (`#XXXXX`)
+   - Use o caso referenciado como valor do `@DEPENDE`
+   - Se não houver referência explícita, use o próprio número do caso
+
+5. **Gerar os cenários Gherkin** com base nos critérios de aceitação e no comportamento descrito:
+
+```
+Funcionalidade: <subject exato do caso Redmine>
+
+  @Automatizar @DEPENDE: #<caso_dependente>
+  Cenário: <descrição curta do comportamento>
+    Dado que <contexto inicial>
+    E <pré-condição adicional se necessária>
+    Quando <ação executada>
+    Então <resultado esperado>
+    E <validação adicional se necessária>
+
+  @Automatizar @DEPENDE: #<caso_dependente>
+  Cenário: <próximo cenário>
+    ...
+```
+
+   **Regras dos cenários:**
+   - Cada critério de aceitação deve virar pelo menos um cenário
+   - Tag `@Automatizar` em todos os cenários
+   - Tag `@DEPENDE: #<numero>` com o caso pai/dependente identificado
+   - Usar verbos no infinitivo nas etapas: "Dado que", "E", "Quando", "Então"
+   - Cenários independentes — cada um deve ser executável isoladamente
+   - Nomear de forma descritiva e técnica
+
+6. **Gerar os casos de teste** no padrão CT:
+
+```
+CT01 – <Descrição curta>
+
+Passos:
+Passo 01: <ação>.
+Passo 02: <ação>.
+
+Resultado Esperado:
+<O que o sistema deve fazer.>
+
+---
+
+CT02 – <próximo caso>
+...
+```
+
+   **Regras dos CT:**
+   - Sequência numérica: CT01, CT02, CT03...
+   - Passos objetivos e executáveis por qualquer testador
+   - Resultado esperado claro e verificável
+   - Cobrir todos os critérios de aceitação do caso
+
+7. **Exibir tudo para o usuário** e perguntar:
+   > "Os cenários e casos de teste estão corretos? Deseja que eu registre no caso do Redmine?"
+
+8. **Se o usuário confirmar:**
+   - Monte o conteúdo em bloco de código dentro de nota Redmine:
+   ```
+   <pre><code class="gherkin">
+   <cenários gerados>
+   </code></pre>
+
+   <cenários CT gerados em texto simples>
+   ```
+   - `post_note(id, notes=<conteudo>)`
+   - Confirme o sucesso
+
+**Regra absoluta: nunca postar no Redmine sem aprovação explícita do usuário.**
 
 ---
 

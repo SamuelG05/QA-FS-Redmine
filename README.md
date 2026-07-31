@@ -17,6 +17,7 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, 
 | `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela no caso |
 | `/criterios-aceitacao` | Lista todos os critérios de aceitação documentados no caso |
 | `/info-caso` | Exibe todas as informações do caso: descrição, histórico completo, anexos e alterações |
+| `/up-refinados` | Lê o card do Trello (Upstream The Wall) + caso no Redmine e gera cenários Gherkin e casos de teste CT |
 
 ---
 
@@ -304,7 +305,8 @@ QA-FS-Redmine/
     ├── finalizar-caso.md
     ├── refinar-caso.md
     ├── criterios-aceitacao.md
-    └── info-caso.md
+    ├── info-caso.md
+    └── up-refinados.md
 ```
 
 ---
@@ -355,5 +357,5 @@ cp commands/*.md ~/.claude/commands/
 
 <div align="center">
   <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 31/07/2026 às 16:30</sub>
+  <sub>Última atualização: 31/07/2026 às 18:00</sub>
 </div>
