@@ -10,9 +10,9 @@ Essa skill conecta o Claude diretamente ao Redmine, permitindo gerenciar casos, 
 
 | Comando | Descrição |
 |---|---|
-| `/inicia-teste` | Atribui o caso ao usuário logado e muda o status para **Em Testes** |
+| `/inicia-teste` | Atribui o caso ao usuário logado, muda o status para **Em Testes** e cria a pasta local do caso |
 | `/plano-teste` | Lê toda a documentação do caso e gera um **Plano de Teste** completo no padrão da equipe |
-| `/registrar-situacao` | Formata e registra uma situação encontrada durante os testes, cria pasta local do caso automaticamente e suporta anexo de imagem |
+| `/registrar-situacao` | Formata e registra uma situação encontrada durante os testes, com suporte a anexo de imagem |
 | `/finalizar-caso` | Identifica o dev, verifica plano de teste, preenche CheckList Resolvido, Tamanho SP e fecha o caso como **Resolvido** |
 | `/refinar-caso` | Registra a pontuação de refinamento (Dev, Teste e Cenário) como tabela no caso |
 | `/criterios-aceitacao` | Lista todos os critérios de aceitação documentados no caso |

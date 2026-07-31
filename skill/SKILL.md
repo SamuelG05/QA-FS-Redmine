@@ -79,7 +79,7 @@ Após criar os arquivos, informe ao usuário discretamente:
 ## Comandos disponíveis
 
 ### /inicia-teste
-Atribui o caso ao usuário logado e muda o status para "Em Testes".
+Atribui o caso ao usuário logado, muda o status para "Em Testes" e cria a pasta local do caso.
 
 **Fluxo:**
 1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
@@ -91,7 +91,18 @@ Atribui o caso ao usuário logado e muda o status para "Em Testes".
 5. Peça confirmação
 6. Aplique:
    - `update_issue(id, status_id=5, assigned_to_id=<user_id>)`
-7. Confirme o sucesso
+7. **Criar pasta local do caso — pergunte uma vez por sessão:**
+   - Na primeira execução de `/inicia-teste` na sessão, pergunte:
+     > "Qual o caminho base para as pastas de casos? (padrão: `C:\Users\PC\OneDrive\CASOS`)"
+   - Se o usuário confirmar ou não responder, use `C:\Users\PC\OneDrive\CASOS`
+   - Salve o caminho em memória de sessão para não perguntar novamente
+   - Crie a pasta do caso via PowerShell se ainda não existir:
+     ```powershell
+     $casePath = "<caminho_base>\<numero_do_caso>"
+     New-Item -ItemType Directory -Force -Path $casePath | Out-Null
+     ```
+   - Informe ao usuário: `📁 Pasta criada em: <caminho_base>\<numero_do_caso>`
+8. Confirme o sucesso
 
 ---
 
@@ -282,24 +293,13 @@ Consolida o encerramento do caso como Resolvido.
 ---
 
 ### /registrar-situacao
-Registra uma situação encontrada durante os testes, com descrição formatada e suporte a anexo. Cria automaticamente uma pasta local para o caso.
+Registra uma situação encontrada durante os testes, com descrição formatada e suporte a anexo.
 
 **Fluxo:**
 
 1. Se o número do caso não foi informado, peça: *"Qual o número do caso? (#)"*
 
-2. **Caminho base das pastas de casos — pergunte uma vez por sessão:**
-   - Na primeira execução de `/registrar-situacao` na sessão, pergunte:
-     > "Qual o caminho base para as pastas de casos? (padrão: `C:\Users\PC\OneDrive\CASOS`)"
-   - Se o usuário confirmar ou não responder, use `C:\Users\PC\OneDrive\CASOS`
-   - Salve o caminho em memória de sessão para não perguntar novamente
-   - Crie a pasta do caso via PowerShell se ainda não existir:
-     ```powershell
-     $casePath = "<caminho_base>\<numero_do_caso>"
-     New-Item -ItemType Directory -Force -Path $casePath | Out-Null
-     ```
-
-3. Busque o título e conte as situações já registradas:
+2. Busque o título e conte as situações já registradas:
    - `get_issue(id, include="journals")`
    - Conte journals que contenham "Situação" para numerar a próxima
 
@@ -322,7 +322,6 @@ Registra uma situação encontrada durante os testes, com descrição formatada 
 
 7. **Lembrete de imagem — exiba sempre:**
    > "📎 Lembre-se: se houver imagem, ela deve ser anexada como **arquivo** (arraste o arquivo até a conversa ou informe o caminho). Prints com Ctrl+V não funcionam como anexo no Redmine."
-   > "📁 Pasta do caso criada em: `<caminho_base>\<numero_do_caso>`"
 
 8. Se houver arquivo a anexar:
    - `upload_file(file_path=<caminho>, content_type=<mime>)` → obtém token
@@ -332,6 +331,8 @@ Registra uma situação encontrada durante os testes, com descrição formatada 
    - `post_note(id, notes=<situacao formatada>)`
 
 9. Confirme o sucesso
+
+---
 
 ---
 
