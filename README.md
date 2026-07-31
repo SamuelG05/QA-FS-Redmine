@@ -355,5 +355,4 @@ cp commands/*.md ~/.claude/commands/
 
 <div align="center">
   <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 07/07/2026 às 16:10</sub>
 </div>
