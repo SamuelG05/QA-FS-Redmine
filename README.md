@@ -223,6 +223,30 @@ Claude: ✅ Refinamento registrado no caso #18044!
 
 ---
 
+## 📋 Fluxo — `/up-refinados`
+
+```
+Usuário: /up-refinados #17707
+
+Claude:
+  Card encontrado no Trello: #17707 - Retaguarda - Criar campos para nota...
+  Lendo o caso no Redmine...
+
+  [gera e exibe os cenários Gherkin]
+  [gera e exibe os casos de teste CT01, CT02...]
+
+  Os cenários e casos de teste estão corretos?
+  Posso registrar no Redmine e mover o card no Trello?
+
+Usuário: Sim
+
+Claude: ✅ Cenários registrados no caso #17707!
+        ✅ Card movido para o topo de Cenários BDD no Trello!
+        ✅ Ingressado no card como membro!
+```
+
+---
+
 ## 📋 Fluxo — `/criterios-aceitacao`
 
 ```
@@ -357,5 +381,5 @@ cp commands/*.md ~/.claude/commands/
 
 <div align="center">
   <sub>Desenvolvido por <a href="https://github.com/SamuelG05">Samuel Gonçalves</a></sub><br>
-  <sub>Última atualização: 31/07/2026 às 18:00</sub>
+  <sub>Última atualização: 31/07/2026 às 18:30</sub>
 </div>
