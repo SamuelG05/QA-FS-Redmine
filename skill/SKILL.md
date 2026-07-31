@@ -518,29 +518,36 @@ Funcionalidade: <subject exato do caso Redmine>
    - Cenários independentes — cada um deve ser executável isoladamente
    - Nomear de forma descritiva e técnica
 
-6. **Gerar os casos de teste** no padrão CT:
+6. **Gerar os casos de teste** no padrão CT com formatação Textile (igual ao plano de teste):
 
 ```
-CT01 – <Descrição curta>
+**CT01 – <Descrição curta>**
 
-Passos:
-Passo 01: <ação>.
-Passo 02: <ação>.
+**Passos:**
+**Passo 01:** <ação>.
+**Passo 02:** <ação>.
+**Passo 03:** <ação>.
 
-Resultado Esperado:
-<O que o sistema deve fazer.>
+**Resultado Esperado:**
+<O que o sistema deve fazer, usando *itálico* em campos técnicos e **negrito** nos termos principais.>
+* **<campo>** — <comportamento esperado>;
+* **<campo>** — <comportamento esperado>.
 
 ---
 
-CT02 – <próximo caso>
+**CT02 – <próximo caso>**
 ...
 ```
 
    **Regras dos CT:**
    - Sequência numérica: CT01, CT02, CT03...
-   - Passos objetivos e executáveis por qualquer testador
-   - Resultado esperado claro e verificável
+   - Título em `**negrito**`
+   - `**Passos:**` e `**Resultado Esperado:**` em negrito
+   - Passos numerados: `**Passo 01:**`, `**Passo 02:**`...
+   - Nomes de campos e tabelas em `*itálico*`
+   - Resultado esperado com itens em lista `*` quando houver múltiplos
    - Cobrir todos os critérios de aceitação do caso
+   - Separador `---` entre cada CT
 
 7. **Exibir tudo para o usuário** e perguntar:
    > "Os cenários e casos de teste estão corretos? Posso registrar no Redmine e mover o card no Trello?"
@@ -548,13 +555,20 @@ CT02 – <próximo caso>
 8. **Se o usuário confirmar — executar as duas ações:**
 
    **8a. Postar no Redmine** (independente do status atual do caso):
-   - Monte o conteúdo e poste via `post_note`:
+   - Monte o conteúdo com cenários em `<pre><code>` (sem class de linguagem) e casos de teste em Textile formatado:
    ```
    <pre><code>
    <cenários Gherkin gerados>
    </code></pre>
 
-   <casos de teste CT em texto simples>
+   ---
+
+   h3. Casos de Teste
+
+   ---
+
+   **CT01 – ...**
+   ...
    ```
    - `post_note(id, notes=<conteudo>)`
 
