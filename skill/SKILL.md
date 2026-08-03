@@ -307,16 +307,22 @@ Registra uma situação encontrada durante os testes, com descrição formatada 
 4. Pergunte a situação:
    > "Qual a situação encontrada?"
 
-5. Formate a descrição corrigindo ortografia e gramática, mas mantendo a lógica e o conteúdo exato do que o usuário relatou. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Monte no padrão:
+5. Formate a descrição corrigindo ortografia e gramática, mas mantendo a lógica e o conteúdo exato do que o usuário relatou. **Mensagens de erro, logs e códigos técnicos devem ser copiados exatamente como o usuário informou — nunca alterar, remover espaços, pontuação ou formatação do erro.** Se houver passo a passo, formate com `**Passo 01:**`, `**Passo 02:**`... em negrito, um por parágrafo (linha em branco entre eles) para ficar legível. Monte no padrão:
 
 ```
 *Situação <N>:*
-<descrição formatada e melhorada>
+<descrição formatada e melhorada, com Passos em negrito se houver>
 
 !{width:600px}<nome_do_arquivo>!
 ```
 
 > A linha `!{width:600px}nome_do_arquivo!` só é incluída se houver imagem — ela faz a imagem aparecer inline no Redmine. Omita se não houver imagem.
+
+> ⚠️ **Atenção — nomes de arquivo com espaço ou acento quebram a exibição inline.** A sintaxe `!{width:600px}nome do arquivo.png!` do Textile **não funciona** se o nome do anexo tiver espaços ou caracteres acentuados (ex: `SITUAÇÃO 1.png`) — o Redmine exibe o texto literal em vez da imagem. Nesses casos, **sempre use a URL completa do anexo** (`content_url` retornado pelo upload ou por `get_issue(include="attachments")`), assim:
+> ```
+> !{width:600px}http://redmine.apisfacil.com/attachments/download/<id>/<nome_url_encoded>!
+> ```
+> Se o nome do arquivo não tiver espaço nem acento, `!{width:600px}nome.png!` funciona normalmente e pode ser usado.
 
 6. Exiba para aprovação:
    > "A descrição está correta? Posso registrar no caso?"
@@ -325,9 +331,9 @@ Registra uma situação encontrada durante os testes, com descrição formatada 
    > "📎 Lembre-se: se houver imagem, ela deve ser anexada como **arquivo** (arraste o arquivo até a conversa ou informe o caminho). Prints com Ctrl+V não funcionam como anexo no Redmine."
 
 8. Se houver arquivo a anexar:
-   - `upload_file(file_path=<caminho>, content_type=<mime>)` → obtém token
-   - `post_note(id, notes=<situacao formatada>, upload_tokens=[{token, filename, content_type}])`
-   
+   - `upload_file(file_path=<caminho>, content_type=<mime>)` → obtém token **e a URL do anexo** (via `content_url` do upload ou consultando o caso logo após o upload)
+   - `post_note(id, notes=<situacao formatada usando a URL completa nas imagens>, upload_tokens=[{token, filename, content_type}])`
+
    Se não houver arquivo:
    - `post_note(id, notes=<situacao formatada>)`
 
