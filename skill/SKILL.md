@@ -94,8 +94,8 @@ Atribui o caso ao usuário logado, muda o status para "Em Testes" e cria a pasta
    - `update_issue(id, status_id=5, assigned_to_id=<user_id>)`
 7. **Criar pasta local do caso — pergunte uma vez por sessão:**
    - Na primeira execução de `/inicia-teste` na sessão, pergunte:
-     > "Qual o caminho base para as pastas de casos? (padrão: `C:\Users\PC\OneDrive\CASOS`)"
-   - Se o usuário confirmar ou não responder, use `C:\Users\PC\OneDrive\CASOS`
+     > "Qual o caminho base para as pastas de casos? (padrão: `D:\OneDrive\CASOS`)"
+   - Se o usuário confirmar ou não responder, use `D:\OneDrive\CASOS`
    - Salve o caminho em memória de sessão para não perguntar novamente
    - Crie a pasta do caso via PowerShell se ainda não existir:
      ```powershell
