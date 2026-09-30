@@ -92,17 +92,23 @@ Atribui o caso ao usuário logado, muda o status para "Em Testes" e cria a pasta
 5. Peça confirmação
 6. Aplique:
    - `update_issue(id, status_id=5, assigned_to_id=<user_id>)`
-7. **Criar pasta local do caso — pergunte uma vez por sessão:**
-   - Na primeira execução de `/inicia-teste` na sessão, pergunte:
-     > "Qual o caminho base para as pastas de casos? (padrão: `D:\OneDrive\CASOS`)"
-   - Se o usuário confirmar ou não responder, use `D:\OneDrive\CASOS`
-   - Salve o caminho em memória de sessão para não perguntar novamente
+7. **Criar pasta local do caso — caminho configurável, perguntado apenas uma vez (persistido entre sessões):**
+   - Leia `$env:USERPROFILE\Documents\QA-FS-Redmine\config.json`. Se existir o campo `casos_path`, use-o direto — **não pergunte novamente**.
+   - Se o campo não existir (primeira vez que a skill roda isso, em qualquer sessão), pergunte:
+     > "Qual o caminho base para as pastas de casos? (ex: `D:\OneDrive\CASOS`)"
+   - Salve a resposta no `config.json` (crie o arquivo/pasta se não existir, preservando os demais campos já salvos como API key):
+     ```powershell
+     $configPath = "$env:USERPROFILE\Documents\QA-FS-Redmine\config.json"
+     $config = if (Test-Path $configPath) { Get-Content $configPath -Raw | ConvertFrom-Json } else { [PSCustomObject]@{} }
+     $config | Add-Member -NotePropertyName casos_path -NotePropertyValue "<caminho_escolhido>" -Force
+     $config | ConvertTo-Json | Set-Content -Path $configPath -Encoding utf8
+     ```
    - Crie a pasta do caso via PowerShell se ainda não existir:
      ```powershell
-     $casePath = "<caminho_base>\<numero_do_caso>"
+     $casePath = "<casos_path>\<numero_do_caso>"
      New-Item -ItemType Directory -Force -Path $casePath | Out-Null
      ```
-   - Informe ao usuário: `📁 Pasta criada em: <caminho_base>\<numero_do_caso>`
+   - Informe ao usuário: `📁 Pasta criada em: <casos_path>\<numero_do_caso>`
 8. Confirme o sucesso
 
 ---
